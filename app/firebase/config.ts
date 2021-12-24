@@ -1,13 +1,12 @@
 import { initializeApp } from 'firebase/app';
-import { child, get, getDatabase, ref, set } from 'firebase/database';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import {
 	getAuth,
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
+	signOut,
+	onAuthStateChanged,
 } from 'firebase/auth';
-
-import { UserData } from '../../App';
 
 const firebaseConfig = {
 	apiKey: process.env.REACT_APP_API_KEY,
@@ -34,6 +33,7 @@ export const registerUserData = async (
 	try {
 		const user = await createUserWithEmailAndPassword(auth, email, password);
 		const docRef = await setDoc(doc(db, 'users', user.user.uid), {
+			userId: user.user.uid,
 			fullname,
 			email,
 			createdAt: new Date().getTime(),
@@ -64,5 +64,31 @@ export const loginUser = async (email: string, password: string) => {
 		}
 	} catch (error) {
 		console.log(error);
+	}
+};
+
+export const signOutUser = async () => {
+	try {
+		const response = await signOut(auth);
+	} catch (error) {}
+};
+
+export const userLogged = async () => {
+	const user = auth.currentUser;
+	if (user) {
+		//get user info
+		const docRef = doc(db, 'users', user.uid);
+		const docSnap = await getDoc(docRef);
+
+		if (docSnap.exists()) {
+			console.log('Document data:', docSnap.data());
+			return docSnap.data();
+		} else {
+			// doc.data() will be undefined in this case
+			console.log('No such document!');
+			return null;
+		}
+	} else {
+		return null;
 	}
 };
