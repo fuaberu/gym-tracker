@@ -1,19 +1,33 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Input from '../components/Input';
 import InputPassword from '../components/InputPassword';
 import LinearButton from '../components/LinearButton';
 import { AntDesign } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import colorStyles from '../config/colors';
+import { registerUserData } from '../firebase/config';
 
-const RegisterScreen = () => {
+const RegisterScreen = ({ navigation }: any) => {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
-	const onLoginPress = () => {};
+	const onSignUpPress = async () => {
+		if (!email || !password || !name) {
+			Alert.alert('Warning!', 'Please fill all empty inputs.');
+		} else {
+			try {
+				//register in firebase
+				await registerUserData(name, email, password);
+				navigation.navigate('Wellcome');
+			} catch (e) {
+				console.log(e);
+			}
+		}
+	};
 
 	return (
 		<View style={styles.container}>
@@ -46,7 +60,7 @@ const RegisterScreen = () => {
 						placeholder="Email"
 					/>
 					<InputPassword setState={setPassword} state={password} />
-					<LinearButton onPress={() => onLoginPress()} text={'Sign Up'} />
+					<LinearButton onPress={() => onSignUpPress()} text={'Sign Up'} />
 				</View>
 			</KeyboardAwareScrollView>
 		</View>

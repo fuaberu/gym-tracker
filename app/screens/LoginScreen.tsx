@@ -1,22 +1,35 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Input from '../components/Input';
 import InputPassword from '../components/InputPassword';
 import LinearButton from '../components/LinearButton';
 import { AntDesign } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import colorStyles from '../config/colors';
+import { loginUser } from '../firebase/config';
 
 const LoginScreen = ({ navigation }: any) => {
 	const [email, setEmail] = useState('');
+	const [emailValid, setEmailValid] = useState(false);
 	const [password, setPassword] = useState('');
+	const [passwordValid, setPasswordValid] = useState(false);
 
 	const onSignUpPress = () => {
 		navigation.navigate('Sign Up');
 	};
 
-	const onLoginPress = () => {};
+	const onLoginPress = () => {
+		if (!email || !password)
+			return Alert.alert('Warning!', 'Please fill all empty inputs.');
+		if (!passwordValid)
+			return Alert.alert('Warning!', 'Password needs to be at least 6 caracheter');
+		if (!emailValid) return Alert.alert('Warning!', 'Please fill in with an valid email');
+		else {
+			loginUser(email, password);
+		}
+	};
 
 	return (
 		<View style={styles.container}>
@@ -39,6 +52,7 @@ const LoginScreen = ({ navigation }: any) => {
 					<Input
 						icon={<AntDesign name="mail" size={24} color={colorStyles.gradient2} />}
 						setState={setEmail}
+						validation={{ type: 'email', setValidation: setEmailValid }}
 						state={email}
 						placeholder="Email"
 					/>
