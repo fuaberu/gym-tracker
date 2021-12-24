@@ -5,10 +5,11 @@ import Input from '../components/Input';
 import InputPassword from '../components/InputPassword';
 import LinearButton from '../components/LinearButton';
 import { AntDesign } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import colorStyles from '../config/colors';
 import { loginUser } from '../firebase/config';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserData } from '../redux/slices/userSlice';
 
 const LoginScreen = ({ navigation }: any) => {
 	const [email, setEmail] = useState('');
@@ -16,19 +17,22 @@ const LoginScreen = ({ navigation }: any) => {
 	const [password, setPassword] = useState('');
 	const [passwordValid, setPasswordValid] = useState(false);
 
+	const dispatch = useDispatch();
+
 	const onSignUpPress = () => {
 		navigation.navigate('Sign Up');
 	};
 
-	const onLoginPress = () => {
+	const onLoginPress = async () => {
 		if (!email || !password)
 			return Alert.alert('Warning!', 'Please fill all empty inputs.');
 		if (!passwordValid)
 			return Alert.alert('Warning!', 'Password needs to be at least 6 caracheter');
 		if (!emailValid) return Alert.alert('Warning!', 'Please fill in with an valid email');
-		else {
-			loginUser(email, password);
-		}
+
+		const user = await loginUser(email, password);
+		dispatch(setUserData(user));
+		navigation.navigate('Wellcome');
 	};
 
 	return (
@@ -56,7 +60,11 @@ const LoginScreen = ({ navigation }: any) => {
 						state={email}
 						placeholder="Email"
 					/>
-					<InputPassword setState={setPassword} state={password} />
+					<InputPassword
+						setState={setPassword}
+						setValidation={setPasswordValid}
+						state={password}
+					/>
 					<LinearButton onPress={() => onLoginPress()} text={'Log in'} />
 					<View style={styles.footerView}>
 						<Text style={styles.footerText}>

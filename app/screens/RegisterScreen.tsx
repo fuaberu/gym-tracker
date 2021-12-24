@@ -5,7 +5,6 @@ import Input from '../components/Input';
 import InputPassword from '../components/InputPassword';
 import LinearButton from '../components/LinearButton';
 import { AntDesign } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import colorStyles from '../config/colors';
 import { registerUserData } from '../firebase/config';
@@ -13,19 +12,23 @@ import { registerUserData } from '../firebase/config';
 const RegisterScreen = ({ navigation }: any) => {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
+	const [emailValid, setEmailValid] = useState(false);
 	const [password, setPassword] = useState('');
+	const [passwordValid, setPasswordValid] = useState(false);
 
 	const onSignUpPress = async () => {
-		if (!email || !password || !name) {
-			Alert.alert('Warning!', 'Please fill all empty inputs.');
-		} else {
-			try {
-				//register in firebase
-				await registerUserData(name, email, password);
-				navigation.navigate('Wellcome');
-			} catch (e) {
-				console.log(e);
-			}
+		if (!email || !password || !name)
+			return Alert.alert('Warning!', 'Please fill all empty inputs.');
+		if (!passwordValid)
+			return Alert.alert('Warning!', 'Password needs to be at least 6 caracheter');
+		if (!emailValid) return Alert.alert('Warning!', 'Please fill in with an valid email');
+
+		try {
+			//register in firebase
+			await registerUserData(name, email, password);
+			navigation.navigate('Wellcome');
+		} catch (e) {
+			console.log(e);
 		}
 	};
 
@@ -56,10 +59,15 @@ const RegisterScreen = ({ navigation }: any) => {
 					<Input
 						icon={<AntDesign name="mail" size={24} color={colorStyles.gradient2} />}
 						setState={setEmail}
+						validation={{ type: 'email', setValidation: setEmailValid }}
 						state={email}
 						placeholder="Email"
 					/>
-					<InputPassword setState={setPassword} state={password} />
+					<InputPassword
+						setState={setPassword}
+						setValidation={setPasswordValid}
+						state={password}
+					/>
 					<LinearButton onPress={() => onSignUpPress()} text={'Sign Up'} />
 				</View>
 			</KeyboardAwareScrollView>

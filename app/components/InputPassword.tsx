@@ -7,10 +7,24 @@ import { AntDesign } from '@expo/vector-icons';
 interface PasswordInterface {
 	setState: (arg0: string) => void;
 	state: string;
+	setValidation: (boolean: boolean) => void;
 }
 
-const InputPassword = ({ setState, state }: PasswordInterface) => {
+const InputPassword = ({ setState, state, setValidation }: PasswordInterface) => {
 	const [hide, setHide] = useState(false);
+	const [isValid, setIsValid] = useState(false);
+
+	const validate = (text: string) => {
+		setState(text);
+		if (text.length >= 6) {
+			setIsValid(true);
+			setValidation(true);
+		} else {
+			setIsValid(false);
+			setValidation(false);
+		}
+	};
+
 	return (
 		<View>
 			<Text style={styles.text}>Password</Text>
@@ -26,10 +40,17 @@ const InputPassword = ({ setState, state }: PasswordInterface) => {
 					)}
 				</TouchableOpacity>
 				<TextInput
-					style={styles.input}
+					style={[
+						styles.input,
+						state
+							? isValid
+								? { borderColor: colorStyles.success }
+								: { borderColor: colorStyles.error }
+							: null,
+					]}
 					placeholder="Password"
 					placeholderTextColor={colorStyles.lightGrey}
-					onChangeText={(text) => setState(text)}
+					onChangeText={(text) => validate(text)}
 					value={state}
 					underlineColorAndroid="transparent"
 					autoCapitalize="none"
