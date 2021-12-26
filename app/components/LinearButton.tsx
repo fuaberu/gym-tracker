@@ -1,10 +1,16 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ReactChild } from 'react';
+import { StyleSheet, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import colorStyles from '../config/colors';
 
-const LinearButton = ({ onPress, text }: { text: string; onPress: () => void }) => {
+const LinearButton = ({
+	onPress,
+	children,
+}: {
+	children: ReactChild;
+	onPress: () => void;
+}) => {
 	return (
 		<TouchableOpacity onPress={() => onPress()}>
 			<LinearGradient
@@ -13,7 +19,7 @@ const LinearButton = ({ onPress, text }: { text: string; onPress: () => void }) 
 				start={[0, 0.5]}
 				end={[1, 0.5]}
 			>
-				<Text style={styles.text}>{text}</Text>
+				<Text style={styles.text}>{children}</Text>
 			</LinearGradient>
 		</TouchableOpacity>
 	);

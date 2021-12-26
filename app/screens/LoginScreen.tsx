@@ -65,7 +65,9 @@ const LoginScreen = ({ navigation }: any) => {
 						setValidation={setPasswordValid}
 						state={password}
 					/>
-					<LinearButton onPress={() => onLoginPress()} text={'Log in'} />
+					<LinearButton onPress={() => onLoginPress()}>
+						<Text>Log in</Text>
+					</LinearButton>
 					<View style={styles.footerView}>
 						<Text style={styles.footerText}>
 							Don't have an account?{' '}

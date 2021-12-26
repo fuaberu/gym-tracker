@@ -68,7 +68,9 @@ const RegisterScreen = ({ navigation }: any) => {
 						setValidation={setPasswordValid}
 						state={password}
 					/>
-					<LinearButton onPress={() => onSignUpPress()} text={'Sign Up'} />
+					<LinearButton onPress={() => onSignUpPress()}>
+						<Text>Sign Up</Text>
+					</LinearButton>
 				</View>
 			</KeyboardAwareScrollView>
 		</View>
