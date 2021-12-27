@@ -10,17 +10,25 @@ import colorStyles from '../config/colors';
 import { loginUser } from '../firebase/config';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData } from '../redux/slices/userSlice';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../App';
+import { useNavigation } from '@react-navigation/native';
+import DivisionLine from '../components/small components/DivisionLine';
 
-const LoginScreen = ({ navigation }: any) => {
+type LoginSceenProp = StackNavigationProp<RootStackParamList, 'Login'>;
+
+const LoginScreen = () => {
 	const [email, setEmail] = useState('');
 	const [emailValid, setEmailValid] = useState(false);
 	const [password, setPassword] = useState('');
 	const [passwordValid, setPasswordValid] = useState(false);
 
+	const navigation = useNavigation<LoginSceenProp>();
+
 	const dispatch = useDispatch();
 
 	const onSignUpPress = () => {
-		navigation.navigate('Sign Up');
+		navigation.navigate('SignUp');
 	};
 
 	const onLoginPress = async () => {
@@ -46,13 +54,7 @@ const LoginScreen = ({ navigation }: any) => {
 			>
 				<View style={styles.form}>
 					<Text style={styles.title}>LOGIN</Text>
-					<View
-						style={{
-							borderBottomColor: colorStyles.gradient2,
-							borderBottomWidth: 1,
-							marginBottom: 5,
-						}}
-					/>
+					<DivisionLine />
 					<Input
 						icon={<AntDesign name="mail" size={24} color={colorStyles.gradient2} />}
 						setState={setEmail}

@@ -8,13 +8,21 @@ import { AntDesign } from '@expo/vector-icons';
 
 import colorStyles from '../config/colors';
 import { registerUserData } from '../firebase/config';
+import { RootStackParamList } from '../../App';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+import DivisionLine from '../components/small components/DivisionLine';
 
-const RegisterScreen = ({ navigation }: any) => {
+type LoginSceenProp = StackNavigationProp<RootStackParamList, 'SignUp'>;
+
+const RegisterScreen = () => {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [emailValid, setEmailValid] = useState(false);
 	const [password, setPassword] = useState('');
 	const [passwordValid, setPasswordValid] = useState(false);
+
+	const navigation = useNavigation<LoginSceenProp>();
 
 	const onSignUpPress = async () => {
 		if (!email || !password || !name)
@@ -43,13 +51,7 @@ const RegisterScreen = ({ navigation }: any) => {
 			>
 				<View style={styles.form}>
 					<Text style={styles.title}>SIGN UP</Text>
-					<View
-						style={{
-							borderBottomColor: colorStyles.gradient2,
-							borderBottomWidth: 1,
-							marginBottom: 5,
-						}}
-					/>
+					<DivisionLine />
 					<Input
 						icon={<AntDesign name="user" size={24} color={colorStyles.gradient2} />}
 						setState={setName}
