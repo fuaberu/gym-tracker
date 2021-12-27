@@ -23,5 +23,6 @@ export default {
 	/* feedback */
 	success: '#88c459',
 	error: '#f5414f',
+	danger: '#F32013',
 	warning: '#ffd137',
 };
