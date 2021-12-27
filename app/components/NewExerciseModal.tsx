@@ -1,9 +1,9 @@
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { RootStackParamList } from '../../App';
+import { RootStackParamList } from '../../Navigation';
 import Input from './Input';
 import DivisionLine from './small components/DivisionLine';
 import { AntDesign } from '@expo/vector-icons';
@@ -11,42 +11,59 @@ import colorStyles from '../config/colors';
 import LinearButton from './LinearButton';
 import { addExercise, getSuggestions, Suggestions } from '../firebase/config';
 import { Exercise } from './ExerciseTable';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
+import { addNewExercise } from '../redux/slices/exercisesSlice';
+
+type NewExerciseModalScreenProp = StackNavigationProp<
+	RootStackParamList,
+	'NewExerciseModal'
+>;
+type NewExerciseModalScreenRouteProp = RouteProp<RootStackParamList, 'NewExerciseModal'>;
 
 const NewExerciseModal = () => {
 	const [exerciseName, setExerciseName] = useState('');
 	const [suggestions, setSuggestions] = useState<Suggestions>([]);
 	const [suggested, setSuggested] = useState<Exercise>();
 
-	const user = useSelector((state: RootState) => state.user);
+	let navigation = useNavigation<NewExerciseModalScreenProp>();
+	const route = useRoute<NewExerciseModalScreenRouteProp>();
+
+	const dispatch = useDispatch();
 
 	const onNameChange = async (text: string) => {
-		if (!user.data) return;
 		setExerciseName(text);
-		const suggestionsServer = await getSuggestions(user.data?.userId);
-		suggestionsServer && setSuggestions(suggestionsServer);
-		console.log('sugges', suggestionsServer);
+		// if (!user.data) return;
+		// const suggestionsServer = await getSuggestions(user.data.userId);
+		// suggestionsServer && setSuggestions(suggestionsServer);
+		// console.log('sugges', suggestionsServer);
 	};
 
 	const pressCreate = async () => {
-		if (!user.data) return;
+		if (!route.params.userId) return;
+		const timestamp = new Date().toString();
 		if (suggested) {
 			//uses a suggestion as base
-			await addExercise({
-				userId: user.data?.userId,
-				name: suggested.name,
-				createdAt: new Date(),
-				sets: suggested.sets,
-			});
+			dispatch(
+				addNewExercise({
+					name: suggested.name,
+					userId: route.params.userId,
+					createdAt: timestamp,
+					sets: suggested.sets,
+				})
+			);
+			navigation.goBack();
 		} else {
 			//creates a new exercise
-			await addExercise({
-				userId: user.data?.userId,
-				name: exerciseName,
-				createdAt: new Date(),
-				sets: [{ weight: 0, reps: 10 }],
-			});
+			dispatch(
+				addNewExercise({
+					userId: route.params.userId,
+					name: exerciseName,
+					createdAt: timestamp,
+					sets: [{ weight: 0, reps: 10 }],
+				})
+			);
+			navigation.goBack();
 		}
 	};
 

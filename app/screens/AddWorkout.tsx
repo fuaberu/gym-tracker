@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -11,22 +11,11 @@ import { Exercise } from '../components/ExerciseTable';
 import { LinearGradient } from 'expo-linear-gradient';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../../App';
-import { useSelector } from 'react-redux';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RootStackParamList } from '../../Navigation';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
-
-const dummyState = [
-	{
-		userId: 'ncajn',
-		name: 'Leg Press',
-		createdAt: new Date(),
-		sets: [
-			{ reps: 20, weight: 250 },
-			{ reps: 10, weight: 250 },
-		],
-	},
-];
+import { UserData } from '../redux/slices/userSlice';
 
 type addWorkoutScreenProp = StackNavigationProp<RootStackParamList, 'AddWorkout'>;
 
@@ -34,13 +23,15 @@ const AddWorkout = () => {
 	const [date, setDate] = useState(new Date());
 	const [showDate, setShowDate] = useState(false);
 
-	const [exercises, setExercises] = useState<Exercise[]>(dummyState);
+	const { data } = useSelector((state: RootState) => state.user);
+	const exercises = useSelector((state: RootState) => state.exercises);
 
-	const [newExerciseName, setNewExerciseName] = useState('');
+	useEffect(() => {
+		console.log('exercises       ', exercises);
+	}, [exercises]);
 
-	let navigation = useNavigation<addWorkoutScreenProp>();
-
-	const user = useSelector((state: RootState) => state.user);
+	const navigation = useNavigation<addWorkoutScreenProp>();
+	const dispatch = useDispatch();
 
 	const onChange = (event: any, selectedDate: Date) => {
 		const currentDate = selectedDate || date;
@@ -52,72 +43,10 @@ const AddWorkout = () => {
 		setShowDate(true);
 	};
 
-	const addLine = (index: number) => {
-		const newExercises = [...exercises];
-
-		console.log('addLne', newExercises);
-		//new line data from the last input
-		const newLineReps =
-			newExercises[index].sets[newExercises[index].sets.length - 1].reps || 0;
-		const newLineWeight =
-			newExercises[index].sets[newExercises[index].sets.length - 1].weight || 0;
-
-		//new line object
-		const newLine = {
-			reps: newLineReps,
-			weight: newLineWeight,
-		};
-
-		//add to the previous table
-		newExercises[index].sets = [...newExercises[index].sets, newLine];
-		setExercises([...newExercises]);
-	};
-
-	const updateExercises = (
-		text: string,
-		tabelIndex: number,
-		lineIndex: number,
-		column: string
-	) => {
-		const newExercises = [...exercises];
-
-		newExercises[tabelIndex].sets[lineIndex][column] = parseInt(text);
-		setExercises([...newExercises]);
-	};
-
-	const updateName = (text: string, tabelIndex: number) => {
-		const newExercises = [...exercises];
-
-		newExercises[tabelIndex].name = text;
-
-		setExercises((prev) => [...newExercises]);
-	};
-
-	const addNewExercise = () => {
-		if (!user.data) return;
-		const newExercise = {
-			userId: user.data?.userId,
-			name: newExerciseName,
-			createdAt: new Date(),
-			weightType: 'kg',
-			sets: [{ reps: 0, weight: 0 }],
-		};
-
-		setExercises((prev) => [...prev, newExercise]);
-	};
-
 	const openNewModal = () => {
-		navigation.navigate('NewExerciseModal');
-	};
-
-	const deleteExercise = (table: number, line: number) => {
-		const newExercises = [...exercises];
-
-		newExercises[table].sets.splice(line, 1);
-
-		console.log('delete', newExercises);
-
-		setExercises([...newExercises]);
+		if (!data) return;
+		console.log('open modal');
+		navigation.navigate('NewExerciseModal', { userId: data.userId });
 	};
 
 	const pressSave = () => {};
@@ -146,17 +75,7 @@ const AddWorkout = () => {
 
 					{/* map exercises tables */}
 					{exercises.map((value, index) => {
-						return (
-							<ExerciseTable
-								exercise={value}
-								addLine={addLine}
-								tabelIndex={index}
-								key={index}
-								updateExercises={updateExercises}
-								updateName={updateName}
-								deleteLine={deleteExercise}
-							/>
-						);
+						return <ExerciseTable exercise={value} tableIndex={index} key={index} />;
 					})}
 
 					<TouchableOpacity onPress={() => openNewModal()}>

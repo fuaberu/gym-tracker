@@ -5,6 +5,8 @@ import colorStyles from '../config/colors';
 import NumericInput from './NumericInput';
 import { AntDesign } from '@expo/vector-icons';
 import DivisionLine from './small components/DivisionLine';
+import { useDispatch } from 'react-redux';
+import { addLine, deleteLine, updateName } from '../redux/slices/exercisesSlice';
 
 interface Set {
 	reps: number;
@@ -15,27 +17,22 @@ interface Set {
 export interface Exercise {
 	userId: string;
 	name: string;
-	createdAt: Date;
+	createdAt: string;
 	sets: Set[];
 }
 
 interface Props {
 	exercise: Exercise;
-	tabelIndex: number;
-	addLine: (arg0: number) => void;
-	deleteLine: (arg0: number, arg1: number) => void;
-	updateExercises: (arg0: string, arg1: number, arg2: number, arg3: string) => void;
-	updateName: (arg0: string, arg1: number) => void;
+	tableIndex: number;
 }
 
-const ExerciseTable = ({
-	exercise,
-	tabelIndex,
-	addLine,
-	updateExercises,
-	updateName,
-	deleteLine,
-}: Props) => {
+const ExerciseTable = ({ exercise, tableIndex }: Props) => {
+	const dispatch = useDispatch();
+
+	const deleteSet = (line: number) => {
+		dispatch(deleteLine({ tableIndex, line }));
+	};
+
 	const LeftSwipe = ({
 		progress,
 		dragAnimatedValue,
@@ -51,10 +48,7 @@ const ExerciseTable = ({
 			extrapolate: 'clamp',
 		});
 		return (
-			<TouchableOpacity
-				style={styles.deleteBox}
-				onPress={() => deleteLine(tabelIndex, line)}
-			>
+			<TouchableOpacity style={styles.deleteBox} onPress={() => deleteSet(line)}>
 				<Animated.View style={{ transform: [{ scale }] }}>
 					<AntDesign name="delete" size={24} color={colorStyles.textPrymary} />
 				</Animated.View>
@@ -67,7 +61,7 @@ const ExerciseTable = ({
 			<View>
 				<TextInput
 					value={exercise.name}
-					onChangeText={(text) => updateName(text, tabelIndex)}
+					onChangeText={(text) => dispatch(updateName({ text, tableIndex }))}
 					style={[styles.text, styles.headline]}
 				/>
 			</View>
@@ -96,18 +90,16 @@ const ExerciseTable = ({
 								<View style={{ flex: 3 }}>
 									<NumericInput
 										value={value.reps.toString()}
-										onChange={updateExercises}
 										lineIndex={lineIndex}
-										tabelIndex={tabelIndex}
+										tableIndex={tableIndex}
 										column={'reps'}
 									/>
 								</View>
 								<View style={{ flex: 3 }}>
 									<NumericInput
 										value={value.weight.toString()}
-										onChange={updateExercises}
 										lineIndex={lineIndex}
-										tabelIndex={tabelIndex}
+										tableIndex={tableIndex}
 										column={'weight'}
 									/>
 								</View>
@@ -117,7 +109,10 @@ const ExerciseTable = ({
 				})}
 			</View>
 			<View style={styles.addLineContainer}>
-				<TouchableOpacity style={styles.addLine} onPress={() => addLine(tabelIndex)}>
+				<TouchableOpacity
+					style={styles.addLine}
+					onPress={() => dispatch(addLine({ index: tableIndex }))}
+				>
 					<AntDesign name="pluscircle" size={34} color={colorStyles.gradient1} />
 				</TouchableOpacity>
 			</View>
