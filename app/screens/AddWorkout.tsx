@@ -13,19 +13,14 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../App';
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
 
 const dummyState = [
 	{
+		userId: 'ncajn',
 		name: 'Leg Press',
-		weightType: 'kg',
-		sets: [
-			{ reps: 20, weight: 250 },
-			{ reps: 10, weight: 250 },
-		],
-	},
-	{
-		name: 'Leg Press',
-		weightType: 'kg',
+		createdAt: new Date(),
 		sets: [
 			{ reps: 20, weight: 250 },
 			{ reps: 10, weight: 250 },
@@ -41,14 +36,11 @@ const AddWorkout = () => {
 
 	const [exercises, setExercises] = useState<Exercise[]>(dummyState);
 
-	const [exercisesSuggestions, setExercisesSuggestions] = useState([
-		'basbc',
-		'nsiuaucia',
-		'ncaincsa',
-	]);
 	const [newExerciseName, setNewExerciseName] = useState('');
 
 	let navigation = useNavigation<addWorkoutScreenProp>();
+
+	const user = useSelector((state: RootState) => state.user);
 
 	const onChange = (event: any, selectedDate: Date) => {
 		const currentDate = selectedDate || date;
@@ -102,8 +94,11 @@ const AddWorkout = () => {
 	};
 
 	const addNewExercise = () => {
+		if (!user.data) return;
 		const newExercise = {
-			name: '',
+			userId: user.data?.userId,
+			name: newExerciseName,
+			createdAt: new Date(),
 			weightType: 'kg',
 			sets: [{ reps: 0, weight: 0 }],
 		};
@@ -112,10 +107,7 @@ const AddWorkout = () => {
 	};
 
 	const openNewModal = () => {
-		navigation.navigate('NewExerciseModal', {
-			setExerciseName: setNewExerciseName,
-			exerciseName: newExerciseName,
-		});
+		navigation.navigate('NewExerciseModal');
 	};
 
 	const deleteExercise = (table: number, line: number) => {

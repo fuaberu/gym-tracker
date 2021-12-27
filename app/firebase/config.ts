@@ -1,5 +1,16 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import {
+	getFirestore,
+	doc,
+	setDoc,
+	getDoc,
+	query,
+	collection,
+	where,
+	getDocs,
+	orderBy,
+	addDoc,
+} from 'firebase/firestore';
 import {
 	getAuth,
 	createUserWithEmailAndPassword,
@@ -7,6 +18,7 @@ import {
 	signOut,
 	onAuthStateChanged,
 } from 'firebase/auth';
+import { Exercise } from '../components/ExerciseTable';
 
 const firebaseConfig = {
 	apiKey: process.env.REACT_APP_API_KEY,
@@ -25,6 +37,7 @@ const db = getFirestore();
 //initialize auth
 const auth = getAuth();
 
+// ----------- AUTH ----------- //
 export const registerUserData = async (
 	fullname: string,
 	email: string,
@@ -76,19 +89,62 @@ export const signOutUser = async () => {
 export const userLogged = async () => {
 	const user = auth.currentUser;
 	if (user) {
-		//get user info
-		const docRef = doc(db, 'users', user.uid);
-		const docSnap = await getDoc(docRef);
+		try {
+			//get user info
+			const docRef = doc(db, 'users', user.uid);
+			const docSnap = await getDoc(docRef);
 
-		if (docSnap.exists()) {
-			console.log('Document data:', docSnap.data());
-			return docSnap.data();
-		} else {
-			// doc.data() will be undefined in this case
-			console.log('No such document!');
-			return null;
+			if (docSnap.exists()) {
+				console.log('Document data:', docSnap.data());
+				return docSnap.data();
+			} else {
+				// doc.data() will be undefined in this case
+				console.log('No such document!');
+				return null;
+			}
+		} catch (error) {
+			console.log(error);
 		}
 	} else {
 		return null;
+	}
+};
+
+// ----------- EXERCISES ----------- //
+export const addExercise = async (exercise: Exercise) => {
+	try {
+		const docRef = await addDoc(collection(db, 'exercises'), exercise);
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+export type Suggestions = Exercise[];
+export const getSuggestions = async (userId: string) => {
+	try {
+		const q = query(
+			collection(db, 'exercises'),
+			where('userId', '==', userId),
+			orderBy('createdAt', 'desc')
+		);
+
+		const querySnapshot = await getDocs(q);
+		const suggestions: Suggestions = [];
+
+		querySnapshot.forEach((doc) => {
+			// doc.data() is never undefined for query doc snapshots
+			const docData = {
+				userId: doc.data().userId,
+				name: doc.data().name,
+				createdAt: doc.data().createdAt,
+				sets: doc.data().sets,
+			};
+			if (suggestions.some((el) => el.name === doc.data().name)) return;
+
+			suggestions.push(docData);
+		});
+		return suggestions;
+	} catch (error) {
+		console.log(error);
 	}
 };

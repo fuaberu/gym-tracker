@@ -13,8 +13,9 @@ interface Set {
 }
 
 export interface Exercise {
+	userId: string;
 	name: string;
-	weightType: string;
+	createdAt: Date;
 	sets: Set[];
 }
 

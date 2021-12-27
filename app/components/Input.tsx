@@ -4,14 +4,22 @@ import { TextInput } from 'react-native-gesture-handler';
 import colorStyles from '../config/colors';
 
 interface InputInterface {
-	placeholder: string;
+	placeholder?: string;
+	label: string;
 	setState: (arg0: string) => void;
 	state: string;
 	icon: JSX.Element;
 	validation?: { type: string; setValidation: (boolean: boolean) => void };
 }
 
-const Input = ({ placeholder, setState, state, icon, validation }: InputInterface) => {
+const Input = ({
+	placeholder,
+	setState,
+	state,
+	icon,
+	validation,
+	label,
+}: InputInterface) => {
 	const [isValid, setIsValid] = useState(false);
 
 	const emailValidation = () => {
@@ -38,7 +46,7 @@ const Input = ({ placeholder, setState, state, icon, validation }: InputInterfac
 	};
 	return (
 		<View>
-			<Text style={styles.text}>{placeholder}</Text>
+			<Text style={styles.text}>{label}</Text>
 			<View>
 				<View style={styles.iconContainer}>{icon}</View>
 				<TextInput
