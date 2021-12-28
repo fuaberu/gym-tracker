@@ -11,7 +11,7 @@ interface PasswordInterface {
 }
 
 const InputPassword = ({ setState, state, setValidation }: PasswordInterface) => {
-	const [hide, setHide] = useState(false);
+	const [hide, setHide] = useState(true);
 	const [isValid, setIsValid] = useState(false);
 
 	const validate = (text: string) => {
@@ -34,9 +34,9 @@ const InputPassword = ({ setState, state, setValidation }: PasswordInterface) =>
 				</View>
 				<TouchableOpacity onPress={() => setHide(!hide)} style={styles.show}>
 					{hide ? (
-						<AntDesign name="eye" size={24} color={colorStyles.gradient2} />
-					) : (
 						<AntDesign name="eyeo" size={24} color={colorStyles.white} />
+					) : (
+						<AntDesign name="eye" size={24} color={colorStyles.gradient2} />
 					)}
 				</TouchableOpacity>
 				<TextInput
