@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Alert, Platform, StyleSheet, Text, View } from 'react-native';
+import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import colorStyles from '../config/colors';
@@ -16,19 +16,18 @@ import { RootStackParamList } from '../../Navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { UserData } from '../redux/slices/userSlice';
+import { saveWorkout } from '../firebase/config';
+import { clearWorkout } from '../redux/slices/exercisesSlice';
 
 type addWorkoutScreenProp = StackNavigationProp<RootStackParamList, 'AddWorkout'>;
 
 const AddWorkout = () => {
 	const [date, setDate] = useState(new Date());
 	const [showDate, setShowDate] = useState(false);
+	const [workoutName, setWorkoutName] = useState('');
 
 	const { data } = useSelector((state: RootState) => state.user);
 	const exercises = useSelector((state: RootState) => state.exercises);
-
-	useEffect(() => {
-		console.log('exercises       ', exercises);
-	}, [exercises]);
 
 	const navigation = useNavigation<addWorkoutScreenProp>();
 	const dispatch = useDispatch();
@@ -49,7 +48,21 @@ const AddWorkout = () => {
 		navigation.navigate('NewExerciseModal', { userId: data.userId });
 	};
 
-	const pressSave = () => {};
+	const pressSave = async () => {
+		if (!data) return;
+		const message = await saveWorkout({
+			exercises,
+			createdAt: date.getTime(),
+			userId: data.userId,
+			name: workoutName,
+		});
+		Alert.alert('Save data', message);
+
+		//clean data
+		dispatch(clearWorkout());
+		setWorkoutName('');
+		setDate(new Date());
+	};
 
 	return (
 		<KeyboardAwareScrollView style={{ flex: 1 }}>
@@ -64,6 +77,13 @@ const AddWorkout = () => {
 							onChange={(event: any, selectedDate: any) => onChange(event, selectedDate)}
 						/>
 					)}
+
+					<Text style={styles.text}>When did you workout?</Text>
+					<TextInput
+						style={styles.text}
+						value={workoutName}
+						onChangeText={(text) => setWorkoutName(text)}
+					/>
 					<Text style={styles.text}>When did you workout?</Text>
 					<TouchableOpacity onPress={showDatepicker} style={styles.dateButton}>
 						<View style={styles.iconContainer}>
