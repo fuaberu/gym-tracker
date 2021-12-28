@@ -9,7 +9,7 @@ import DivisionLine from './small components/DivisionLine';
 import { AntDesign } from '@expo/vector-icons';
 import colorStyles from '../config/colors';
 import LinearButton from './LinearButton';
-import { addExercise, getSuggestions, Suggestions } from '../firebase/config';
+import { getSuggestions, Suggestions } from '../firebase/config';
 import { Exercise } from './ExerciseTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
@@ -24,7 +24,7 @@ type NewExerciseModalScreenRouteProp = RouteProp<RootStackParamList, 'NewExercis
 const NewExerciseModal = () => {
 	const [exerciseName, setExerciseName] = useState('');
 	const [suggestions, setSuggestions] = useState<Suggestions>([]);
-	const [suggested, setSuggested] = useState<Exercise>();
+	const [suggested, setSuggested] = useState<Exercise | null>(null);
 
 	let navigation = useNavigation<NewExerciseModalScreenProp>();
 	const route = useRoute<NewExerciseModalScreenRouteProp>();
@@ -33,15 +33,15 @@ const NewExerciseModal = () => {
 
 	const onNameChange = async (text: string) => {
 		setExerciseName(text);
-		// if (!user.data) return;
-		// const suggestionsServer = await getSuggestions(user.data.userId);
-		// suggestionsServer && setSuggestions(suggestionsServer);
-		// console.log('sugges', suggestionsServer);
+		setSuggested(null);
+		const suggestionsServer = await getSuggestions(route.params.userId, text);
+		if (!suggestionsServer) return setSuggestions([]);
+		setSuggestions(suggestionsServer);
 	};
 
 	const pressCreate = async () => {
 		if (!route.params.userId) return;
-		const timestamp = new Date().toString();
+		const timestamp = new Date().getTime();
 		if (suggested) {
 			//uses a suggestion as base
 			dispatch(
@@ -70,6 +70,7 @@ const NewExerciseModal = () => {
 	const suggestionPress = (suggestion: Exercise) => {
 		setSuggested(suggestion);
 		setExerciseName(suggestion.name);
+		setSuggestions([]);
 	};
 
 	return (
@@ -83,11 +84,17 @@ const NewExerciseModal = () => {
 					state={exerciseName}
 					label="Exercise Name"
 				/>
-				<View>
+				<View style={styles.suggestionsContainer}>
 					{suggestions.map((suggestion, index) => {
-						<TouchableOpacity onPress={() => suggestionPress(suggestion)} key={index}>
-							<Text>{suggestion}</Text>
-						</TouchableOpacity>;
+						return (
+							<TouchableOpacity
+								style={styles.suggestion}
+								onPress={() => suggestionPress(suggestion)}
+								key={index}
+							>
+								<Text style={styles.text}>{suggestion.name}</Text>
+							</TouchableOpacity>
+						);
 					})}
 				</View>
 			</View>
@@ -100,4 +107,21 @@ const NewExerciseModal = () => {
 
 export default NewExerciseModal;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+	text: { color: colorStyles.textPrymary },
+	suggestionsContainer: {
+		position: 'absolute',
+		top: 110,
+		left: 20,
+		right: 20,
+		elevation: 1,
+		backgroundColor: colorStyles.componentBackground,
+	},
+	suggestion: {
+		backgroundColor: colorStyles.componentBackgroundSecondary,
+		marginBottom: 5,
+		padding: 10,
+		elevation: 2,
+		zIndex: 1,
+	},
+});
