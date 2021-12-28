@@ -29,8 +29,11 @@ interface Props {
 const ExerciseTable = ({ exercise, tableIndex }: Props) => {
 	const dispatch = useDispatch();
 
+	let swipeRef: Array<any> = [];
+
 	const deleteSet = (line: number) => {
 		dispatch(deleteLine({ tableIndex, line }));
+		swipeRef[line].close();
 	};
 
 	const LeftSwipe = ({
@@ -72,6 +75,7 @@ const ExerciseTable = ({ exercise, tableIndex }: Props) => {
 				{exercise.sets.map((value, lineIndex) => {
 					return (
 						<Swipeable
+							ref={(ref) => (swipeRef[lineIndex] = ref)}
 							key={lineIndex}
 							renderLeftActions={(progress, dragAnimatedValue) => (
 								<LeftSwipe
