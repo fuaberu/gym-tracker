@@ -8,10 +8,12 @@ import { AntDesign } from '@expo/vector-icons';
 
 import colorStyles from '../config/colors';
 import { registerUserData } from '../firebase/config';
-import { RootStackParamList } from '../../App';
+import { RootStackParamList } from '../../Navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import DivisionLine from '../components/small components/DivisionLine';
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../redux/slices/userSlice';
 
 type LoginSceenProp = StackNavigationProp<RootStackParamList, 'SignUp'>;
 
@@ -23,6 +25,7 @@ const RegisterScreen = () => {
 	const [passwordValid, setPasswordValid] = useState(false);
 
 	const navigation = useNavigation<LoginSceenProp>();
+	const dispatch = useDispatch();
 
 	const onSignUpPress = async () => {
 		if (!email || !password || !name)
@@ -33,8 +36,8 @@ const RegisterScreen = () => {
 
 		try {
 			//register in firebase
-			await registerUserData(name, email, password);
-			navigation.navigate('Wellcome');
+			const docRef = await registerUserData(name, email, password);
+			dispatch(setUserData(docRef));
 		} catch (e) {
 			console.log(e);
 		}
@@ -53,17 +56,17 @@ const RegisterScreen = () => {
 					<Text style={styles.title}>SIGN UP</Text>
 					<DivisionLine />
 					<Input
+						label="Full Name"
 						icon={<AntDesign name="user" size={24} color={colorStyles.gradient2} />}
 						setState={setName}
 						state={name}
-						placeholder="Full Name"
 					/>
 					<Input
+						label="Email"
 						icon={<AntDesign name="mail" size={24} color={colorStyles.gradient2} />}
 						setState={setEmail}
 						validation={{ type: 'email', setValidation: setEmailValid }}
 						state={email}
-						placeholder="Email"
 					/>
 					<InputPassword
 						setState={setPassword}
