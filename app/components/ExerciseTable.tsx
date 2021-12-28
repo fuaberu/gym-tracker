@@ -1,12 +1,22 @@
 import React from 'react';
 import { Animated, StyleSheet, Text, TextInput, View } from 'react-native';
-import { Swipeable, TouchableOpacity } from 'react-native-gesture-handler';
+import {
+	LongPressGestureHandler,
+	State,
+	Swipeable,
+	TouchableOpacity,
+} from 'react-native-gesture-handler';
 import colorStyles from '../config/colors';
 import NumericInput from './NumericInput';
 import { AntDesign } from '@expo/vector-icons';
 import DivisionLine from './small components/DivisionLine';
 import { useDispatch } from 'react-redux';
-import { addLine, deleteLine, updateName } from '../redux/slices/exercisesSlice';
+import {
+	addLine,
+	deleteExercise,
+	deleteLine,
+	updateName,
+} from '../redux/slices/exercisesSlice';
 
 interface Set {
 	reps: number;
@@ -36,6 +46,12 @@ const ExerciseTable = ({ exercise, tableIndex }: Props) => {
 		swipeRef[line].close();
 	};
 
+	const deleteTable = (event: { nativeEvent: { state: any } }) => {
+		if (event.nativeEvent.state === State.ACTIVE) {
+			dispatch(deleteExercise({ tableIndex }));
+		}
+	};
+
 	const LeftSwipe = ({
 		progress,
 		dragAnimatedValue,
@@ -60,67 +76,69 @@ const ExerciseTable = ({ exercise, tableIndex }: Props) => {
 	};
 
 	return (
-		<View style={styles.container}>
-			<View>
-				<TextInput
-					value={exercise.name}
-					onChangeText={(text) => dispatch(updateName({ text, tableIndex }))}
-					style={[styles.text, styles.headline]}
-				/>
-			</View>
+		<LongPressGestureHandler onHandlerStateChange={deleteTable} minDurationMs={500}>
+			<View style={styles.container}>
+				<View>
+					<TextInput
+						value={exercise.name}
+						onChangeText={(text) => dispatch(updateName({ text, tableIndex }))}
+						style={[styles.text, styles.headline]}
+					/>
+				</View>
 
-			<DivisionLine />
-			<View>
-				{/* teble lines */}
-				{exercise.sets.map((value, lineIndex) => {
-					return (
-						<Swipeable
-							ref={(ref) => (swipeRef[lineIndex] = ref)}
-							key={lineIndex}
-							renderLeftActions={(progress, dragAnimatedValue) => (
-								<LeftSwipe
-									progress={progress}
-									dragAnimatedValue={dragAnimatedValue}
-									line={lineIndex}
-								/>
-							)}
-						>
-							<View style={styles.lineTable}>
-								<View style={styles.setStyle}>
-									<Text style={[styles.lineText, styles.setTextStyle]}>{`Set ${
-										lineIndex + 1
-									}`}</Text>
-								</View>
-								<View style={{ flex: 3 }}>
-									<NumericInput
-										value={value.reps.toString()}
-										lineIndex={lineIndex}
-										tableIndex={tableIndex}
-										column={'reps'}
+				<DivisionLine />
+				<View>
+					{/* teble lines */}
+					{exercise.sets.map((value, lineIndex) => {
+						return (
+							<Swipeable
+								ref={(ref) => (swipeRef[lineIndex] = ref)}
+								key={lineIndex}
+								renderLeftActions={(progress, dragAnimatedValue) => (
+									<LeftSwipe
+										progress={progress}
+										dragAnimatedValue={dragAnimatedValue}
+										line={lineIndex}
 									/>
+								)}
+							>
+								<View style={styles.lineTable}>
+									<View style={styles.setStyle}>
+										<Text style={[styles.lineText, styles.setTextStyle]}>{`Set ${
+											lineIndex + 1
+										}`}</Text>
+									</View>
+									<View style={{ flex: 3 }}>
+										<NumericInput
+											value={value.reps.toString()}
+											lineIndex={lineIndex}
+											tableIndex={tableIndex}
+											column={'reps'}
+										/>
+									</View>
+									<View style={{ flex: 3 }}>
+										<NumericInput
+											value={value.weight.toString()}
+											lineIndex={lineIndex}
+											tableIndex={tableIndex}
+											column={'weight'}
+										/>
+									</View>
 								</View>
-								<View style={{ flex: 3 }}>
-									<NumericInput
-										value={value.weight.toString()}
-										lineIndex={lineIndex}
-										tableIndex={tableIndex}
-										column={'weight'}
-									/>
-								</View>
-							</View>
-						</Swipeable>
-					);
-				})}
+							</Swipeable>
+						);
+					})}
+				</View>
+				<View style={styles.addLineContainer}>
+					<TouchableOpacity
+						style={styles.addLine}
+						onPress={() => dispatch(addLine({ index: tableIndex }))}
+					>
+						<AntDesign name="pluscircle" size={34} color={colorStyles.gradient1} />
+					</TouchableOpacity>
+				</View>
 			</View>
-			<View style={styles.addLineContainer}>
-				<TouchableOpacity
-					style={styles.addLine}
-					onPress={() => dispatch(addLine({ index: tableIndex }))}
-				>
-					<AntDesign name="pluscircle" size={34} color={colorStyles.gradient1} />
-				</TouchableOpacity>
-			</View>
-		</View>
+		</LongPressGestureHandler>
 	);
 };
 

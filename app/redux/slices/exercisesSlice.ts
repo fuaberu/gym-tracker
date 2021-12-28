@@ -11,7 +11,9 @@ export const exercisesSlice = createSlice({
 			state.push(payload);
 		},
 		updateExercise: (state, { payload }) => {
-			state[payload.tableIndex].sets[payload.lineIndex][payload.column] = parseInt(
+			if (isNaN(payload.text)) payload.text = 0;
+
+			state[payload.tableIndex].sets[payload.lineIndex][payload.column] = Number(
 				payload.text
 			);
 		},
@@ -34,11 +36,24 @@ export const exercisesSlice = createSlice({
 		deleteLine: (state, { payload }) => {
 			state[payload.tableIndex].sets.splice(payload.line, 1);
 		},
+		deleteExercise: (state, { payload }) => {
+			state.splice(payload.tableIndex, 1);
+		},
+		clearWorkout: (state) => {
+			state = [];
+		},
 	},
 });
 
 // Action creators are generated for each case reducer function
-export const { addNewExercise, updateExercise, updateName, addLine, deleteLine } =
-	exercisesSlice.actions;
+export const {
+	addNewExercise,
+	updateExercise,
+	updateName,
+	addLine,
+	deleteLine,
+	deleteExercise,
+	clearWorkout,
+} = exercisesSlice.actions;
 
 export default exercisesSlice.reducer;
