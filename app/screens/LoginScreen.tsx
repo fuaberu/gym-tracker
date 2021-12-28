@@ -8,10 +8,10 @@ import { AntDesign } from '@expo/vector-icons';
 
 import colorStyles from '../config/colors';
 import { loginUser } from '../firebase/config';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/slices/userSlice';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import { RootStackParamList } from '../../Navigation';
 import { useNavigation } from '@react-navigation/native';
 import DivisionLine from '../components/small components/DivisionLine';
 
@@ -40,7 +40,6 @@ const LoginScreen = () => {
 
 		const user = await loginUser(email, password);
 		dispatch(setUserData(user));
-		navigation.navigate('Wellcome');
 	};
 
 	return (
@@ -56,6 +55,7 @@ const LoginScreen = () => {
 					<Text style={styles.title}>LOGIN</Text>
 					<DivisionLine />
 					<Input
+						label="Email"
 						icon={<AntDesign name="mail" size={24} color={colorStyles.gradient2} />}
 						setState={setEmail}
 						validation={{ type: 'email', setValidation: setEmailValid }}
