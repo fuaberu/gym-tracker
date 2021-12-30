@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Alert, Platform, StyleSheet, Text, View } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -7,17 +7,23 @@ import colorStyles from '../config/colors';
 import { AntDesign } from '@expo/vector-icons';
 import LinearButton from '../components/LinearButton';
 import ExerciseTable from '../components/ExerciseTable';
-import { Exercise } from '../components/ExerciseTable';
 import { LinearGradient } from 'expo-linear-gradient';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../Navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
-import { UserData } from '../redux/slices/userSlice';
 import { saveWorkout } from '../firebase/config';
-import { clearWorkout } from '../redux/slices/exercisesSlice';
+import {
+	addLine,
+	clearExercises,
+	deleteExercise,
+	deleteLine,
+	updateExercise,
+	updateName,
+} from '../redux/slices/exercisesSlice';
+import { addWorkout } from '../redux/slices/workoutsSlice';
 
 type addWorkoutScreenProp = StackNavigationProp<RootStackParamList, 'AddWorkout'>;
 
@@ -50,22 +56,55 @@ const AddWorkout = () => {
 
 	const pressSave = async () => {
 		if (!data) return;
-		const message = await saveWorkout({
+		const workoutUpload = {
 			exercises,
 			createdAt: date.getTime(),
 			userId: data.userId,
 			name: workoutName,
-		});
+		};
+		const message = await saveWorkout(
+			exercises,
+			date.getTime(),
+			data.userId,
+			workoutName
+		);
 		Alert.alert('Save data', message);
 
+		//add to workouts redux
+		dispatch(addWorkout(workoutUpload));
+
 		//clean data
-		dispatch(clearWorkout());
+		dispatch(clearExercises());
 		setWorkoutName('');
 		setDate(new Date());
 	};
 
+	//exercise table functions
+	const updateExerciseName = (text: string, tableIndex: number) => {
+		dispatch(updateName({ text, tableIndex }));
+	};
+
+	const addExerciseLine = (index: number) => {
+		dispatch(addLine({ index }));
+	};
+	const deleteSet = (line: number, tableIndex: number) => {
+		dispatch(deleteLine({ tableIndex, line }));
+	};
+	const deleteTable = (tableIndex: number) => {
+		dispatch(deleteExercise({ tableIndex }));
+	};
+
+	const onExerciseInputChange = (
+		text: string,
+		lineIndex: number,
+		column: string,
+		tableIndex: number
+	) => {
+		dispatch(updateExercise({ tableIndex, lineIndex, column, text }));
+	};
+
 	return (
-		<KeyboardAwareScrollView style={{ flex: 1 }}>
+		<KeyboardAwareScrollView style={{ flex: 1, padding: 10 }}>
 			<View style={styles.container}>
 				<View>
 					{showDate && (
@@ -78,14 +117,18 @@ const AddWorkout = () => {
 						/>
 					)}
 
-					<Text style={styles.text}>When did you workout?</Text>
+					<Text style={styles.text}>Workout name</Text>
+
 					<TextInput
-						style={styles.text}
+						style={[styles.text, styles.input]}
 						value={workoutName}
 						onChangeText={(text) => setWorkoutName(text)}
 					/>
 					<Text style={styles.text}>When did you workout?</Text>
-					<TouchableOpacity onPress={showDatepicker} style={styles.dateButton}>
+					<TouchableOpacity
+						onPress={showDatepicker}
+						style={[styles.dateButton, styles.input]}
+					>
 						<View style={styles.iconContainer}>
 							<AntDesign name="calendar" size={24} color={colorStyles.gradient2} />
 						</View>
@@ -95,10 +138,21 @@ const AddWorkout = () => {
 
 					{/* map exercises tables */}
 					{exercises.map((value, index) => {
-						return <ExerciseTable exercise={value} tableIndex={index} key={index} />;
+						return (
+							<ExerciseTable
+								exercise={value}
+								tableIndex={index}
+								onChange={onExerciseInputChange}
+								key={index}
+								addExerciseLine={addExerciseLine}
+								updateExerciseName={updateExerciseName}
+								deleteLine={deleteSet}
+								deleteExercise={deleteTable}
+							/>
+						);
 					})}
 
-					<TouchableOpacity onPress={() => openNewModal()}>
+					<TouchableOpacity onPress={() => openNewModal()} style={{ marginTop: 10 }}>
 						<LinearGradient
 							start={[0, 0.5]}
 							end={[1, 0.5]}
@@ -117,8 +171,8 @@ const AddWorkout = () => {
 					</TouchableOpacity>
 				</View>
 
-				<LinearButton onPress={pressSave}>
-					<Text>Save</Text>
+				<LinearButton style={styles.saveBtn} onPress={pressSave}>
+					<Text style={styles.saveBtn}>Save</Text>
 				</LinearButton>
 			</View>
 		</KeyboardAwareScrollView>
@@ -129,6 +183,16 @@ export default AddWorkout;
 
 const styles = StyleSheet.create({
 	container: { flex: 1, justifyContent: 'space-between', marginBottom: 25 },
+	input: {
+		height: 48,
+		borderRadius: 5,
+		overflow: 'hidden',
+		borderColor: colorStyles.darkGrey,
+		backgroundColor: colorStyles.componentBackgroundSecondary,
+		borderWidth: 1,
+		marginTop: 10,
+		marginBottom: 10,
+	},
 	iconContainer: {
 		position: 'absolute',
 		top: 0,
@@ -139,14 +203,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	dateButton: {
-		height: 48,
-		borderRadius: 5,
-		overflow: 'hidden',
-		borderColor: colorStyles.darkGrey,
-		backgroundColor: colorStyles.componentBackgroundSecondary,
-		borderWidth: 1,
-		marginTop: 10,
-		marginBottom: 10,
 		paddingLeft: 40,
 		justifyContent: 'center',
 	},
@@ -169,4 +225,5 @@ const styles = StyleSheet.create({
 		borderRadius: 1000,
 		padding: 10,
 	},
+	saveBtn: { padding: 10, color: colorStyles.white, fontWeight: 'bold' },
 });

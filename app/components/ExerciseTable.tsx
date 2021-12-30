@@ -6,17 +6,11 @@ import {
 	Swipeable,
 	TouchableOpacity,
 } from 'react-native-gesture-handler';
-import colorStyles from '../config/colors';
 import NumericInput from './NumericInput';
 import { AntDesign } from '@expo/vector-icons';
 import DivisionLine from './small components/DivisionLine';
-import { useDispatch } from 'react-redux';
-import {
-	addLine,
-	deleteExercise,
-	deleteLine,
-	updateName,
-} from '../redux/slices/exercisesSlice';
+import colorStyles from '../config/colors';
+import globalStyles from '../config/globalStyles';
 
 interface Set {
 	reps: number;
@@ -34,21 +28,32 @@ export interface Exercise {
 interface Props {
 	exercise: Exercise;
 	tableIndex: number;
+	updateExerciseName: (text: string, tableIndex: number) => void;
+	addExerciseLine: (index: number) => void;
+	deleteLine: (line: number, tableIndex: number) => void;
+	onChange: (text: string, lineIndex: number, column: string, tableIndex: number) => void;
+	deleteExercise: (tableIndex: number) => void;
 }
 
-const ExerciseTable = ({ exercise, tableIndex }: Props) => {
-	const dispatch = useDispatch();
-
+const ExerciseTable = ({
+	exercise,
+	tableIndex,
+	updateExerciseName,
+	addExerciseLine,
+	deleteLine,
+	onChange,
+	deleteExercise,
+}: Props) => {
 	let swipeRef: Array<any> = [];
 
 	const deleteSet = (line: number) => {
-		dispatch(deleteLine({ tableIndex, line }));
+		deleteLine(line, tableIndex);
 		swipeRef[line].close();
 	};
 
 	const deleteTable = (event: { nativeEvent: { state: any } }) => {
 		if (event.nativeEvent.state === State.ACTIVE) {
-			dispatch(deleteExercise({ tableIndex }));
+			deleteExercise(tableIndex);
 		}
 	};
 
@@ -77,18 +82,18 @@ const ExerciseTable = ({ exercise, tableIndex }: Props) => {
 
 	return (
 		<LongPressGestureHandler onHandlerStateChange={deleteTable} minDurationMs={500}>
-			<View style={styles.container}>
+			<View style={[styles.container, globalStyles.componentElevated]}>
 				<View>
 					<TextInput
 						value={exercise.name}
-						onChangeText={(text) => dispatch(updateName({ text, tableIndex }))}
+						onChangeText={(text) => updateExerciseName(text, tableIndex)}
 						style={[styles.text, styles.headline]}
 					/>
 				</View>
 
 				<DivisionLine />
 				<View>
-					{/* teble lines */}
+					{/* table lines */}
 					{exercise.sets.map((value, lineIndex) => {
 						return (
 							<Swipeable
@@ -110,17 +115,19 @@ const ExerciseTable = ({ exercise, tableIndex }: Props) => {
 									</View>
 									<View style={{ flex: 3 }}>
 										<NumericInput
-											value={value.reps.toString()}
-											lineIndex={lineIndex}
 											tableIndex={tableIndex}
+											value={value.reps.toString()}
+											onChange={onChange}
+											lineIndex={lineIndex}
 											column={'reps'}
 										/>
 									</View>
 									<View style={{ flex: 3 }}>
 										<NumericInput
+											tableIndex={tableIndex}
+											onChange={onChange}
 											value={value.weight.toString()}
 											lineIndex={lineIndex}
-											tableIndex={tableIndex}
 											column={'weight'}
 										/>
 									</View>
@@ -132,7 +139,7 @@ const ExerciseTable = ({ exercise, tableIndex }: Props) => {
 				<View style={styles.addLineContainer}>
 					<TouchableOpacity
 						style={styles.addLine}
-						onPress={() => dispatch(addLine({ index: tableIndex }))}
+						onPress={() => addExerciseLine(tableIndex)}
 					>
 						<AntDesign name="pluscircle" size={34} color={colorStyles.gradient1} />
 					</TouchableOpacity>
@@ -158,17 +165,6 @@ const styles = StyleSheet.create({
 		padding: 8,
 		marginBottom: 25,
 		borderRadius: 10,
-		backgroundColor: colorStyles.componentBackgroundSecondary,
-
-		shadowColor: colorStyles.componentBackground,
-		shadowOffset: {
-			width: 0,
-			height: 8,
-		},
-		shadowOpacity: 0.44,
-		shadowRadius: 10.32,
-
-		elevation: 16,
 	},
 	setStyle: {
 		flex: 2,
