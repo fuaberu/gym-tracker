@@ -8,18 +8,19 @@ import RegisterScreen from './app/screens/RegisterScreen';
 import WellcomeScreen from './app/screens/WellcomeScreen';
 import { useEffect, useState } from 'react';
 import colorStyles from './app/config/colors';
-import { userLogged } from './app/firebase/config';
+import { getUserWorkouts, userLogged, Workout } from './app/firebase/config';
 import { setUserData, UserState } from './app/redux/slices/userSlice';
 import SchedulerScreen from './app/screens/SchedulerScreen';
 import AddWorkout from './app/screens/AddWorkout';
 import NewExerciseModal from './app/components/NewExerciseModal';
-
-//ignore timer warnings
-import { LogBox } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './app/redux/store';
 import { Exercise } from './app/components/ExerciseTable';
+import WorkoutDetailsModal from './app/modals/WorkoutDetailsModal';
 
+//ignore timer warnings
+import { LogBox } from 'react-native';
+import { setReduxWorkouts } from './app/redux/slices/workoutsSlice';
 LogBox.ignoreLogs(['Setting a timer']);
 
 export type RootStackParamList = {
@@ -28,6 +29,7 @@ export type RootStackParamList = {
 	AddWorkout: undefined;
 	SignUp: undefined;
 	Login: undefined;
+	WorkoutDetailsModal: { workoutId: string };
 	NewExerciseModal: { userId: string };
 };
 
@@ -39,13 +41,27 @@ export default function Navigation() {
 
 	const dispatch = useDispatch();
 
+	const getWorkouts = async (userId: string) => {
+		if (!userId) return;
+		console.log('here');
+		const workoutsData = await getUserWorkouts(userId);
+
+		if (!workoutsData) return;
+		//update state
+		dispatch(setReduxWorkouts(workoutsData));
+	};
+
 	const getUser = async () => {
 		const loggedUser = await userLogged();
 		if (loggedUser) {
+			await getWorkouts(loggedUser.userId);
 			dispatch(setUserData(loggedUser));
 			setAppLoading(false);
-			console.log('loggoed in');
+			console.log('loggoed in', loggedUser.userId);
 		} else {
+			//development
+			user.data && (await getWorkouts(user.data.userId));
+			//development
 			setAppLoading(false);
 			console.log('NOT loggoed in');
 		}
@@ -117,6 +133,18 @@ export default function Navigation() {
 									headerStyle: styles.headerStyle,
 									headerTintColor: colorStyles.textPrymary,
 									title: 'Add new exercise',
+									headerTitleStyle: {
+										fontWeight: 'bold',
+									},
+								}}
+							/>
+							<Stack.Screen
+								name="WorkoutDetailsModal"
+								component={WorkoutDetailsModal}
+								options={{
+									headerStyle: styles.headerStyle,
+									headerTintColor: colorStyles.textPrymary,
+									title: 'Workout details',
 									headerTitleStyle: {
 										fontWeight: 'bold',
 									},
