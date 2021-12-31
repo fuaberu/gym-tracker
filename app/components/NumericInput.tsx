@@ -22,6 +22,7 @@ const NumericInput = ({ value, lineIndex, column, onChange, tableIndex }: Props)
 
 	return (
 		<TextInput
+			maxLength={14}
 			keyboardType="numeric"
 			value={value !== 0 ? value.toString() : ''}
 			onChangeText={(text) => onChange(text, lineIndex, column, tableIndex)}
