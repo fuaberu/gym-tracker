@@ -13,6 +13,8 @@ import {
 	writeBatch,
 	startAt,
 	endAt,
+	updateDoc,
+	deleteDoc,
 } from 'firebase/firestore';
 import {
 	getAuth,
@@ -92,6 +94,7 @@ export const signOutUser = async () => {
 		const response = await signOut(auth);
 		return response;
 	} catch (error) {
+		console.log(error);
 		return error;
 	}
 };
@@ -120,13 +123,19 @@ export const userLogged = async () => {
 
 // ----------- EXERCISES ----------- //
 export type Workout = {
+	workoutId: string;
 	name: string | null;
 	userId: string;
 	createdAt: number;
 	exercises: Exercise[];
 };
 
-export const saveWorkout = async ({ exercises, createdAt, userId, name }: Workout) => {
+export const saveWorkout = async (
+	exercises: Exercise[],
+	createdAt: number,
+	userId: string,
+	name: string
+) => {
 	try {
 		const batch = writeBatch(db);
 		//set exercises
@@ -136,13 +145,64 @@ export const saveWorkout = async ({ exercises, createdAt, userId, name }: Workou
 		});
 		//set workout
 		const workoutRef = doc(collection(db, 'workouts'));
-		const workoutObj: Workout = { exercises, createdAt, userId, name };
+		const workoutObj: Workout = {
+			exercises,
+			createdAt,
+			userId,
+			name,
+			workoutId: workoutRef.id,
+		};
 		batch.set(workoutRef, workoutObj);
 		await batch.commit();
 		return 'Data stored succesfully';
 	} catch (error) {
 		console.log(error);
 		return 'Data couldnt be stored succesfully';
+	}
+};
+
+export const updateDbWorkouts = async (workout: Workout) => {
+	try {
+		const workoutRef = doc(db, 'workouts', workout.workoutId);
+
+		await updateDoc(workoutRef, workout);
+		return 'Workout updated successfully';
+	} catch (error) {
+		console.log(error);
+		return 'Error to updated';
+	}
+};
+
+export const deleteDbWorkouts = async (workoutId: string) => {
+	try {
+		const workoutRef = doc(db, 'workouts', workoutId);
+
+		await deleteDoc(workoutRef);
+		return 'Workout deleted successfully';
+	} catch (error) {
+		console.log(error);
+		return 'Error to delete';
+	}
+};
+
+export const getUserWorkouts = async (userId: string) => {
+	try {
+		const workouts: Workout[] = [];
+		const q = query(collection(db, 'workouts'), where('userId', '==', userId));
+
+		const querySnapshot = await getDocs(q);
+		querySnapshot.forEach((doc) => {
+			workouts.push({
+				name: doc.data().name,
+				userId: doc.data().userId,
+				createdAt: doc.data().createdAt,
+				exercises: doc.data().exercises,
+				workoutId: doc.data().workoutId,
+			});
+		});
+		return workouts;
+	} catch (error) {
+		console.log(error);
 	}
 };
 

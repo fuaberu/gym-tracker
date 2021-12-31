@@ -11,6 +11,9 @@ import { AntDesign } from '@expo/vector-icons';
 import DivisionLine from './small components/DivisionLine';
 import colorStyles from '../config/colors';
 import globalStyles from '../config/globalStyles';
+import Stats from './Stats';
+import { RootState } from '../redux/store';
+import { useSelector } from 'react-redux';
 
 interface Set {
 	reps: number;
@@ -45,6 +48,8 @@ const ExerciseTable = ({
 	deleteExercise,
 }: Props) => {
 	let swipeRef: Array<any> = [];
+
+	const { data } = useSelector((state: RootState) => state.user);
 
 	const deleteSet = (line: number) => {
 		deleteLine(line, tableIndex);
@@ -92,6 +97,7 @@ const ExerciseTable = ({
 				</View>
 
 				<DivisionLine />
+				{data && <Stats exercise={exercise} weightOption={data.options.weight} />}
 				<View>
 					{/* table lines */}
 					{exercise.sets.map((value, lineIndex) => {
@@ -116,7 +122,7 @@ const ExerciseTable = ({
 									<View style={{ flex: 3 }}>
 										<NumericInput
 											tableIndex={tableIndex}
-											value={value.reps.toString()}
+											value={value.reps}
 											onChange={onChange}
 											lineIndex={lineIndex}
 											column={'reps'}
@@ -126,7 +132,7 @@ const ExerciseTable = ({
 										<NumericInput
 											tableIndex={tableIndex}
 											onChange={onChange}
-											value={value.weight.toString()}
+											value={value.weight}
 											lineIndex={lineIndex}
 											column={'weight'}
 										/>
