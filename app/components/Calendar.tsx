@@ -17,6 +17,7 @@ type wellcomeScreenProp = StackNavigationProp<RootStackParamList, 'Wellcome'>;
 
 const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 	const [activeDate, setActiveDate] = useState(new Date());
+	const [selectedDay, setSelectedDay] = useState(new Date());
 
 	const navigation = useNavigation<wellcomeScreenProp>();
 
@@ -53,11 +54,10 @@ const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 				new Date(e.createdAt).getFullYear() === year
 		);
 		if (match) {
-			console.log('match');
-			daysMatrix.push({ id: i, day: dayCount, workoutId: match.workoutId });
+			daysMatrix.push({ id: i, day: dayCount, workoutId: match.workoutId, month, year });
 			dayCount++;
 		} else if (firstDay <= i && dayCount <= maxDays) {
-			daysMatrix.push({ id: i, day: dayCount });
+			daysMatrix.push({ id: i, day: dayCount, month, year });
 			dayCount++;
 		} else {
 			daysMatrix.push({ id: i, day: 0 });
@@ -65,14 +65,29 @@ const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 	}
 
 	const changeMonth = (n: number) => {
-		const newDate = new Date(activeDate.setMonth(month + n));
-		setActiveDate(newDate);
+		if (n > 0) {
+			var futureMonth = moment(activeDate).add(1, 'M');
+			var thisMonthEnd = moment(activeDate).endOf('month');
+			if (futureMonth.month() !== activeDate.getMonth() + 1) {
+				const newDate = moment(activeDate).add(
+					thisMonthEnd.date() - activeDate.getDate() + 1,
+					'days'
+				);
+				setActiveDate(newDate.toDate());
+			} else {
+				setActiveDate(futureMonth.toDate());
+			}
+		} else {
+			let fm = moment(activeDate).subtract(1, 'M');
+			setActiveDate(moment(fm).toDate());
+		}
 	};
 
 	const pressDay = (day: number) => {
-		day !== 0 && setActiveDate(new Date(activeDate.setDate(day)));
+		day !== 0 && setSelectedDay(new Date(year, month, day));
 	};
 	const pressWorkoutDay = (day: number, workoutId: string) => {
+		setSelectedDay(new Date(year, month, day));
 		navigation.navigate('WorkoutDetailsModal', {
 			workoutId: workoutId,
 		});
@@ -119,8 +134,9 @@ const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 											styles.text,
 											{
 												color:
-													item.day === activeDate.getDate() &&
-													month === activeDate.getMonth()
+													item.day === selectedDay.getDate() &&
+													item.month === selectedDay.getMonth() &&
+													item.year === selectedDay.getFullYear()
 														? colorStyles.gradient2
 														: colorStyles.textPrymary,
 											},
