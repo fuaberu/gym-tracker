@@ -11,14 +11,12 @@ export const exercisesSlice = createSlice({
 			state.push(payload);
 		},
 		updateExercise: (state, { payload }) => {
-			if (isNaN(payload.text)) payload.text = 0;
+			if (isNaN(payload.text)) return;
 
-			state[payload.tableIndex].sets[payload.lineIndex][payload.column] = Number(
-				payload.text
-			);
+			state[payload.tableIndex].sets[payload.lineIndex][payload.column] = payload.text;
 		},
 		updateName: (state, { payload }) => {
-			state[payload.tabelIndex].name = payload.text;
+			state[payload.tableIndex].name = payload.text;
 		},
 		addLine: (state, { payload }) => {
 			//new line data from the last input
@@ -39,8 +37,8 @@ export const exercisesSlice = createSlice({
 		deleteExercise: (state, { payload }) => {
 			state.splice(payload.tableIndex, 1);
 		},
-		clearWorkout: (state) => {
-			state = [];
+		clearExercises: (state) => {
+			return [];
 		},
 	},
 });
@@ -53,7 +51,7 @@ export const {
 	addLine,
 	deleteLine,
 	deleteExercise,
-	clearWorkout,
+	clearExercises,
 } = exercisesSlice.actions;
 
 export default exercisesSlice.reducer;

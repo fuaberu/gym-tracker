@@ -7,19 +7,21 @@ import colorStyles from '../config/colors';
 const LinearButton = ({
 	onPress,
 	children,
+	style,
 }: {
 	children: ReactChild;
 	onPress: () => void;
+	style?: any;
 }) => {
 	return (
-		<TouchableOpacity onPress={() => onPress()}>
+		<TouchableOpacity onPress={() => onPress()} style={style}>
 			<LinearGradient
 				colors={[colorStyles.gradient1, colorStyles.gradient2]}
 				style={styles.button}
 				start={[0, 0.5]}
 				end={[1, 0.5]}
 			>
-				<Text style={styles.text}>{children}</Text>
+				{children}
 			</LinearGradient>
 		</TouchableOpacity>
 	);
@@ -29,17 +31,7 @@ export default LinearButton;
 
 const styles = StyleSheet.create({
 	button: {
-		marginLeft: 30,
-		marginRight: 30,
-		marginTop: 20,
-		height: 48,
-		borderRadius: 5,
 		alignItems: 'center',
 		justifyContent: 'center',
-	},
-	text: {
-		color: 'white',
-		fontSize: 16,
-		fontWeight: 'bold',
 	},
 });

@@ -4,7 +4,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import colorStyles from '../config/colors';
 
 interface Props {
-	value: string;
+	value: number;
 	lineIndex: number;
 	column: string;
 	tableIndex: number;
@@ -23,7 +23,7 @@ const NumericInput = ({ value, lineIndex, column, onChange, tableIndex }: Props)
 	return (
 		<TextInput
 			keyboardType="numeric"
-			value={value}
+			value={value !== 0 ? value.toString() : ''}
 			onChangeText={(text) => onChange(text, lineIndex, column, tableIndex)}
 			onBlur={onBlur}
 			onFocus={onFocus}
