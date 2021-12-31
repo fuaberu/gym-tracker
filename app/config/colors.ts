@@ -21,8 +21,8 @@ export default {
 	white: '#fff',
 
 	/* feedback */
-	success: '#88c459',
+	success: '#42ba96',
 	error: '#f5414f',
-	danger: '#F32013',
+	danger: '#df4759',
 	warning: '#ffd137',
 };
