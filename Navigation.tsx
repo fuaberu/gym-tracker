@@ -1,29 +1,31 @@
 import 'react-native-gesture-handler';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet } from 'react-native';
 
 import LoginScreen from './app/screens/LoginScreen';
 import RegisterScreen from './app/screens/RegisterScreen';
 import WellcomeScreen from './app/screens/WellcomeScreen';
 import { useEffect, useState } from 'react';
-import colorStyles from './app/config/colors';
-import { getUserWorkouts, userLogged, Workout } from './app/firebase/config';
-import { setUserData, UserState } from './app/redux/slices/userSlice';
+import { getUserWorkouts, userLogged } from './app/firebase/config';
+import { setUserData } from './app/redux/slices/userSlice';
 import SchedulerScreen from './app/screens/SchedulerScreen';
 import AddWorkout from './app/screens/AddWorkout';
-import NewExerciseModal from './app/components/NewExerciseModal';
+import NewExerciseModal from './app/modals/NewExerciseModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './app/redux/store';
-import { Exercise } from './app/components/ExerciseTable';
 import WorkoutDetailsModal from './app/modals/WorkoutDetailsModal';
+import colorStyles from './app/config/colors';
+import globalStyles from './app/config/globalStyles';
 
 //ignore timer warnings
 import { LogBox } from 'react-native';
 import { setReduxWorkouts } from './app/redux/slices/workoutsSlice';
+import ProfileScreen from './app/screens/ProfileScreen';
 LogBox.ignoreLogs(['Setting a timer']);
 
 export type RootStackParamList = {
+	Profile: undefined;
 	Wellcome: undefined;
 	Schedule: undefined;
 	AddWorkout: undefined;
@@ -43,7 +45,6 @@ export default function Navigation() {
 
 	const getWorkouts = async (userId: string) => {
 		if (!userId) return;
-		console.log('here');
 		const workoutsData = await getUserWorkouts(userId);
 
 		if (!workoutsData) return;
@@ -57,13 +58,11 @@ export default function Navigation() {
 			await getWorkouts(loggedUser.userId);
 			dispatch(setUserData(loggedUser));
 			setAppLoading(false);
-			console.log('loggoed in', loggedUser.userId);
 		} else {
 			//development
 			user.data && (await getWorkouts(user.data.userId));
 			//development
 			setAppLoading(false);
-			console.log('NOT loggoed in');
 		}
 		console.log(user);
 	};
@@ -78,9 +77,11 @@ export default function Navigation() {
 
 	if (appLoading)
 		return (
-			<View>
-				<Text>loading</Text>
-			</View>
+			<ActivityIndicator
+				size={50}
+				color={colorStyles.gradient2}
+				style={globalStyles.absoluteCenter}
+			/>
 		);
 
 	const MyTheme = {
@@ -102,6 +103,17 @@ export default function Navigation() {
 							name="Wellcome"
 							component={WellcomeScreen}
 							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="Profile"
+							component={ProfileScreen}
+							options={{
+								headerStyle: styles.headerStyle,
+								headerTintColor: colorStyles.textPrymary,
+								headerTitleStyle: {
+									fontWeight: 'bold',
+								},
+							}}
 						/>
 						<Stack.Screen
 							name="Schedule"
