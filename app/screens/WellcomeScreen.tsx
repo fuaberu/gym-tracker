@@ -1,4 +1,11 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+	ActivityIndicator,
+	Image,
+	Pressable,
+	StyleSheet,
+	Text,
+	View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
@@ -6,11 +13,11 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../Navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
 import colorStyles from '../config/colors';
-import { useDispatch, useSelector } from 'react-redux';
+import globalStyles from '../config/globalStyles';
+import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import Calendar from '../components/Calendar';
-import { setReduxWorkouts } from '../redux/slices/workoutsSlice';
-import { getUserWorkouts, Workout } from '../firebase/config';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 type wellcomeScreenProp = StackNavigationProp<RootStackParamList, 'Wellcome'>;
 
@@ -31,11 +38,12 @@ export default function WellcomeScreen() {
 
 	const wellcomeMessage = () => {
 		const currentHour = parseFloat(moment().format('HH'));
-		if (currentHour >= 12 && currentHour <= 17) {
+		console.log(currentHour);
+		if (currentHour >= 12 && currentHour <= 18) {
 			setMessage('Good afternoon,');
-		} else if (currentHour >= 17) {
+		} else if (currentHour > 18) {
 			setMessage('Good evening,');
-		} else {
+		} else if (currentHour > 4) {
 			setMessage('Good morning,');
 		}
 	};
@@ -44,25 +52,43 @@ export default function WellcomeScreen() {
 		wellcomeMessage();
 	}, []);
 
+	const openProfile = () => {
+		navigation.navigate('Profile');
+	};
+
+	if (!data)
+		return (
+			<ActivityIndicator
+				size={50}
+				color={colorStyles.gradient2}
+				style={globalStyles.absoluteCenter}
+			/>
+		);
+
 	return (
 		<SafeAreaView>
 			<View
 				style={{
 					flexDirection: 'row',
 					justifyContent: 'space-between',
-					alignContent: 'center',
+					alignItems: 'center',
 				}}
 			>
 				<View>
 					<Text style={styles.text}>{message}</Text>
 					<Text style={styles.text}>{data?.fullname}</Text>
 				</View>
-				<Image
-					source={{
-						uri: 'https://isaojose.com.br/wp-content/uploads/2020/12/blank-profile-picture-mystery-man-avatar-973460.jpg',
-					}}
-					style={{ width: 40, height: 40, borderRadius: 1000 }}
-				/>
+				<View style={{ alignItems: 'center' }}>
+					<TouchableOpacity onPress={openProfile}>
+						<Image
+							source={{
+								uri: 'https://isaojose.com.br/wp-content/uploads/2020/12/blank-profile-picture-mystery-man-avatar-973460.jpg',
+							}}
+							style={{ width: 40, height: 40, borderRadius: 1000 }}
+						/>
+					</TouchableOpacity>
+					<Text>{`${workouts.length} Workouts`}</Text>
+				</View>
 			</View>
 			<Pressable onPress={onPressSchedule}>
 				<Text style={styles.text}>go to schedule</Text>
