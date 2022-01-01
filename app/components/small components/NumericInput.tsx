@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
-import colorStyles from '../config/colors';
+import colorStyles from '../../config/colors';
 
 interface Props {
 	value: number;

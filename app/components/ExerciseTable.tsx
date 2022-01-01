@@ -6,7 +6,7 @@ import {
 	Swipeable,
 	TouchableOpacity,
 } from 'react-native-gesture-handler';
-import NumericInput from './NumericInput';
+import NumericInput from './small components/NumericInput';
 import { AntDesign } from '@expo/vector-icons';
 import DivisionLine from './small components/DivisionLine';
 import colorStyles from '../config/colors';

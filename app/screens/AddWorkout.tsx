@@ -5,7 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import colorStyles from '../config/colors';
 import { AntDesign } from '@expo/vector-icons';
-import LinearButton from '../components/LinearButton';
+import LinearButton from '../components/small components/LinearButton';
 import ExerciseTable from '../components/ExerciseTable';
 import { LinearGradient } from 'expo-linear-gradient';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';

@@ -4,7 +4,7 @@ import moment from 'moment';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import { AntDesign } from '@expo/vector-icons';
 import colorStyles from '../config/colors';
-import LinearButton from './LinearButton';
+import LinearButton from './small components/LinearButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { useNavigation } from '@react-navigation/native';

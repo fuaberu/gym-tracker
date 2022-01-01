@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
-import colorStyles from '../config/colors';
+import colorStyles from '../../config/colors';
 import { AntDesign } from '@expo/vector-icons';
 
 interface PasswordInterface {

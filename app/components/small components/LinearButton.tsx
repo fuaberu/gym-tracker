@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ReactChild } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import colorStyles from '../config/colors';
+import colorStyles from '../../config/colors';
 
 const LinearButton = ({
 	onPress,

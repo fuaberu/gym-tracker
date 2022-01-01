@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import Input from '../components/Input';
-import InputPassword from '../components/InputPassword';
-import LinearButton from '../components/LinearButton';
+import Input from '../components/small components/Input';
+import InputPassword from '../components/small components/InputPassword';
+import LinearButton from '../components/small components/LinearButton';
 import { AntDesign } from '@expo/vector-icons';
 
 import colorStyles from '../config/colors';
