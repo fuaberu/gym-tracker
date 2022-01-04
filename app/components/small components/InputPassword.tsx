@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Button, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
-import colorStyles from '../../config/colors';
 import { AntDesign } from '@expo/vector-icons';
+import colorStyles from '../../config/colors';
+import globalStyles from '../../config/globalStyles';
 
 interface PasswordInterface {
 	setState: (arg0: string) => void;
@@ -27,9 +28,9 @@ const InputPassword = ({ setState, state, setValidation }: PasswordInterface) =>
 
 	return (
 		<View>
-			<Text style={styles.text}>Password</Text>
+			<Text style={globalStyles.textTitleSecondary}>Password</Text>
 			<View>
-				<View style={styles.iconContainer}>
+				<View style={globalStyles.iconContainer}>
 					<AntDesign name="lock" size={24} color={colorStyles.gradient2} />
 				</View>
 				<TouchableOpacity onPress={() => setHide(!hide)} style={styles.show}>
@@ -41,7 +42,7 @@ const InputPassword = ({ setState, state, setValidation }: PasswordInterface) =>
 				</TouchableOpacity>
 				<TextInput
 					style={[
-						styles.input,
+						globalStyles.input,
 						state
 							? isValid
 								? { borderColor: colorStyles.success }
@@ -64,18 +65,6 @@ const InputPassword = ({ setState, state, setValidation }: PasswordInterface) =>
 export default InputPassword;
 
 const styles = StyleSheet.create({
-	text: {
-		color: colorStyles.grey,
-	},
-	iconContainer: {
-		position: 'absolute',
-		top: 0,
-		left: 12,
-		right: 12,
-		bottom: 0,
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
 	show: {
 		position: 'absolute',
 		top: 0,
@@ -84,15 +73,5 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		zIndex: 1000,
-	},
-	input: {
-		height: 48,
-		borderRadius: 1000,
-		overflow: 'hidden',
-		borderColor: colorStyles.darkGrey,
-		borderWidth: 1,
-		marginTop: 10,
-		marginBottom: 10,
-		paddingLeft: 40,
 	},
 });

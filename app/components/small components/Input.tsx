@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import colorStyles from '../../config/colors';
+import globalStyles from '../../config/globalStyles';
 
 interface InputInterface {
 	placeholder?: string;
@@ -46,12 +47,13 @@ const Input = ({
 	};
 	return (
 		<View>
-			<Text style={styles.text}>{label}</Text>
+			<Text style={globalStyles.textTitleSecondary}>{label}</Text>
 			<View>
-				<View style={styles.iconContainer}>{icon}</View>
+				<View style={globalStyles.iconContainer}>{icon}</View>
 				<TextInput
 					style={[
-						styles.input,
+						globalStyles.input,
+						globalStyles.textSecondary,
 						validation && state
 							? isValid
 								? { borderColor: colorStyles.success }
@@ -72,27 +74,4 @@ const Input = ({
 
 export default Input;
 
-const styles = StyleSheet.create({
-	text: {
-		color: colorStyles.grey,
-	},
-	iconContainer: {
-		position: 'absolute',
-		top: 0,
-		left: 12,
-		right: 12,
-		bottom: 0,
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	input: {
-		height: 48,
-		borderRadius: 1000,
-		overflow: 'hidden',
-		borderColor: colorStyles.darkGrey,
-		borderWidth: 1,
-		marginTop: 10,
-		marginBottom: 10,
-		paddingLeft: 40,
-	},
-});
+const styles = StyleSheet.create({});
