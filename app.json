@@ -1,6 +1,6 @@
 {
 	"expo": {
-		"name": "exercise-tracker",
+		"name": "Exercise Tracker",
 		"slug": "exercise-tracker",
 		"version": "1.0.0",
 		"orientation": "portrait",
@@ -8,7 +8,7 @@
 		"splash": {
 			"image": "./app/assets/splash.png",
 			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
+			"backgroundColor": "#252238"
 		},
 		"updates": {
 			"fallbackToCacheTimeout": 0
@@ -20,11 +20,19 @@
 		"android": {
 			"adaptiveIcon": {
 				"foregroundImage": "./app/assets/adaptive-icon.png",
-				"backgroundColor": "#FFFFFF"
+				"backgroundColor": "#252238"
 			}
 		},
 		"web": {
 			"favicon": "./app/assets/favicon.png"
-		}
+		},
+		"plugins": [
+			[
+				"expo-image-picker",
+				{
+					"photosPermission": "The app accesses your photos to use it as profile picture."
+				}
+			]
+		]
 	}
 }
