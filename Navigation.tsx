@@ -9,7 +9,6 @@ import WellcomeScreen from './app/screens/WellcomeScreen';
 import { useEffect, useState } from 'react';
 import { getUserWorkouts, userLogged } from './app/firebase/config';
 import { setUserData } from './app/redux/slices/userSlice';
-import SchedulerScreen from './app/screens/SchedulerScreen';
 import AddWorkout from './app/screens/AddWorkout';
 import NewExerciseModal from './app/modals/NewExerciseModal';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +21,7 @@ import globalStyles from './app/config/globalStyles';
 import { LogBox } from 'react-native';
 import { setReduxWorkouts } from './app/redux/slices/workoutsSlice';
 import ProfileScreen from './app/screens/ProfileScreen';
+import SettingsModal from './app/modals/SettingsModal';
 LogBox.ignoreLogs(['Setting a timer']);
 
 export type RootStackParamList = {
@@ -32,7 +32,8 @@ export type RootStackParamList = {
 	SignUp: undefined;
 	Login: undefined;
 	WorkoutDetailsModal: { workoutId: string };
-	NewExerciseModal: { userId: string };
+	NewExerciseModal: { userId: string; date: number };
+	SettingsModal: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -57,14 +58,8 @@ export default function Navigation() {
 		if (loggedUser) {
 			await getWorkouts(loggedUser.userId);
 			dispatch(setUserData(loggedUser));
-			setAppLoading(false);
-		} else {
-			//development
-			user.data && (await getWorkouts(user.data.userId));
-			//development
-			setAppLoading(false);
 		}
-		console.log(user);
+		setAppLoading(false);
 	};
 
 	useEffect(() => {
@@ -116,17 +111,6 @@ export default function Navigation() {
 							}}
 						/>
 						<Stack.Screen
-							name="Schedule"
-							component={SchedulerScreen}
-							options={{
-								headerStyle: styles.headerStyle,
-								headerTintColor: colorStyles.textPrymary,
-								headerTitleStyle: {
-									fontWeight: 'bold',
-								},
-							}}
-						/>
-						<Stack.Screen
 							name="AddWorkout"
 							component={AddWorkout}
 							options={{
@@ -157,6 +141,18 @@ export default function Navigation() {
 									headerStyle: styles.headerStyle,
 									headerTintColor: colorStyles.textPrymary,
 									title: 'Workout details',
+									headerTitleStyle: {
+										fontWeight: 'bold',
+									},
+								}}
+							/>
+							<Stack.Screen
+								name="SettingsModal"
+								component={SettingsModal}
+								options={{
+									headerStyle: styles.headerStyle,
+									headerTintColor: colorStyles.textPrymary,
+									title: 'Settings',
 									headerTitleStyle: {
 										fontWeight: 'bold',
 									},

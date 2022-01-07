@@ -41,14 +41,13 @@ const NewExerciseModal = () => {
 
 	const pressCreate = async () => {
 		if (!route.params.userId) return;
-		const timestamp = new Date().getTime();
 		if (suggested) {
 			//uses a suggestion as base
 			dispatch(
 				addNewExercise({
 					name: suggested.name,
 					userId: route.params.userId,
-					createdAt: timestamp,
+					createdAt: route.params.date,
 					sets: suggested.sets,
 				})
 			);
@@ -59,7 +58,7 @@ const NewExerciseModal = () => {
 				addNewExercise({
 					userId: route.params.userId,
 					name: exerciseName,
-					createdAt: timestamp,
+					createdAt: route.params.date,
 					sets: [{ weight: 0, reps: 10 }],
 				})
 			);
