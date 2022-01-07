@@ -5,10 +5,11 @@ import { store } from './app/redux/store';
 import { Provider } from 'react-redux';
 import Navigation from './Navigation';
 
-//ignore timer warnings
+//ignore warnings
 import { LogBox } from 'react-native';
 
 LogBox.ignoreLogs(['Setting a timer']);
+LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
 
 export default function App() {
 	return (
