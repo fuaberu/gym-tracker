@@ -3,17 +3,19 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Input from '../components/small components/Input';
 import InputPassword from '../components/small components/InputPassword';
-import LinearButton from '../components/small components/LinearButton';
 import { AntDesign } from '@expo/vector-icons';
 
 import colorStyles from '../config/colors';
-import { loginUser } from '../firebase/config';
+import { getUserWorkouts, loginUser } from '../firebase/config';
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/slices/userSlice';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../Navigation';
 import { useNavigation } from '@react-navigation/native';
 import DivisionLine from '../components/small components/DivisionLine';
+import { setReduxWorkouts } from '../redux/slices/workoutsSlice';
+import ActionBtn from '../components/small components/ActionBtn';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type LoginSceenProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -39,11 +41,17 @@ const LoginScreen = () => {
 		if (!emailValid) return Alert.alert('Warning!', 'Please fill in with an valid email');
 
 		const user = await loginUser(email, password);
+		if (!user) return;
 		dispatch(setUserData(user));
+
+		const workoutsData = await getUserWorkouts(user.userId);
+
+		//update workouts state
+		workoutsData && dispatch(setReduxWorkouts(workoutsData));
 	};
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			<KeyboardAwareScrollView
 				style={{
 					flex: 1,
@@ -67,9 +75,7 @@ const LoginScreen = () => {
 						setValidation={setPasswordValid}
 						state={password}
 					/>
-					<LinearButton onPress={() => onLoginPress()}>
-						<Text>Log in</Text>
-					</LinearButton>
+					<ActionBtn text="Login" onPress={onLoginPress} />
 					<View style={styles.footerView}>
 						<Text style={styles.footerText}>
 							Don't have an account?{' '}
@@ -80,7 +86,7 @@ const LoginScreen = () => {
 					</View>
 				</View>
 			</KeyboardAwareScrollView>
-		</View>
+		</SafeAreaView>
 	);
 };
 

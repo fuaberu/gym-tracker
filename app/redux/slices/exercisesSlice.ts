@@ -18,6 +18,9 @@ export const exercisesSlice = createSlice({
 		updateName: (state, { payload }) => {
 			state[payload.tableIndex].name = payload.text;
 		},
+		updateDate: (state, { payload }) => {
+			state.forEach((e) => (e.createdAt = payload.date));
+		},
 		addLine: (state, { payload }) => {
 			//new line data from the last input
 			const setsLength = state[payload.index].sets.length;
@@ -48,6 +51,7 @@ export const {
 	addNewExercise,
 	updateExercise,
 	updateName,
+	updateDate,
 	addLine,
 	deleteLine,
 	deleteExercise,

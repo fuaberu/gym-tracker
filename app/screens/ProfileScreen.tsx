@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, StyleSheet, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import colorStyles from '../config/colors';
@@ -11,7 +11,14 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MeasureInput from '../components/small components/MeasureInput';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
-import { updateUser } from '../firebase/config';
+import { updateUser, uplpoadUserPic } from '../firebase/config';
+import * as ImagePicker from 'expo-image-picker';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../Navigation';
+import { useNavigation } from '@react-navigation/native';
+import ActionBtn from '../components/small components/ActionBtn';
+
+type ProfileSceenProp = StackNavigationProp<RootStackParamList, 'Profile'>;
 
 const ProfileScreen = () => {
 	const { data } = useSelector((state: RootState) => state.user);
@@ -27,14 +34,81 @@ const ProfileScreen = () => {
 	const [email, setEmail] = useState(data.email);
 	const [weight, setWeight] = useState(data.weight);
 	const [height, setHeight] = useState(data.height);
+	const [profilePic, setProfilePic] = useState(data.profilePic);
+
+	const [image, setImage] = useState<ImagePicker.ImageInfo>();
+	const [uploading, setUploading] = useState(false);
+
+	const navigation = useNavigation<ProfileSceenProp>();
 
 	const updateData = async () => {
-		const newUser = await updateUser(data.userId, { fullname, email, weight, height });
-		console.log(newUser);
+		setUploading(true);
+		if (image) {
+			setUploading(true);
+			const { uri } = image;
+			const filename = uri.substring(uri.lastIndexOf('/') + 1);
+			const response = await fetch(uri);
+			const blob = await response.blob();
+			console.log(filename, image);
+
+			const downloadUrl = await uplpoadUserPic(filename, blob);
+			if (!downloadUrl) {
+				Alert.alert(
+					'Error',
+					'Profile piicture could not be updated, please try again later'
+				);
+			} else {
+				setProfilePic(downloadUrl);
+				await updateUser(data.userId, {
+					fullname,
+					email,
+					weight,
+					height,
+					profilePic: downloadUrl,
+				});
+			}
+			setUploading(false);
+		} else {
+			const newUser = await updateUser(data.userId, {
+				fullname,
+				email,
+				weight,
+				height,
+			});
+			setUploading(false);
+		}
 	};
+
+	const pickImage = async () => {
+		// No permissions request is necessary for launching the image library
+		let result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: true,
+			aspect: [1, 1],
+			quality: 1,
+		});
+		if (!result.cancelled) {
+			setImage(result);
+			setProfilePic(result.uri);
+		}
+	};
+
+	const pressSettings = () => {
+		navigation.navigate('SettingsModal');
+	};
+
 	const deleteAccount = () => {};
 	return (
 		<View style={{ padding: 10 }}>
+			{uploading && (
+				<View style={styles.uploading}>
+					<ActivityIndicator
+						size={50}
+						color={colorStyles.gradient2}
+						style={globalStyles.absoluteCenter}
+					/>
+				</View>
+			)}
 			<View
 				style={{
 					alignItems: 'center',
@@ -42,10 +116,10 @@ const ProfileScreen = () => {
 				}}
 			>
 				<View style={{ width: 80, height: 80, borderRadius: 100 }}>
-					<TouchableOpacity onPress={() => console.log('click')}>
+					<TouchableOpacity onPress={() => pickImage()}>
 						<Image
 							source={
-								data.profilePic ? data.profilePic : require('../assets/default_pfp.jpg')
+								profilePic ? { uri: profilePic } : require('../assets/default_pfp.jpg')
 							}
 							style={{ width: 80, height: 80, borderRadius: 100 }}
 						/>
@@ -54,7 +128,7 @@ const ProfileScreen = () => {
 				<View style={styles.settingsBtn}>
 					<TouchableOpacity
 						style={{ flexDirection: 'row' }}
-						onPress={() => console.log('here')}
+						onPress={() => pressSettings()}
 					>
 						<AntDesign name="setting" size={35} color={colorStyles.gradient2} />
 					</TouchableOpacity>
@@ -107,21 +181,7 @@ const ProfileScreen = () => {
 						option={data.options.length}
 					/>
 				</View>
-				<TouchableOpacity onPress={updateData}>
-					<LinearGradient
-						colors={[colorStyles.gradient1, colorStyles.gradient2]}
-						style={styles.buttonContainer}
-					>
-						<Text
-							style={[
-								globalStyles.textPrimary,
-								{ alignSelf: 'center', textTransform: 'uppercase' },
-							]}
-						>
-							Update
-						</Text>
-					</LinearGradient>
-				</TouchableOpacity>
+				<ActionBtn text="Update" onPress={updateData} />
 				<TouchableOpacity onPress={deleteAccount}>
 					<LinearGradient
 						colors={[colorStyles.danger, colorStyles.error]}
@@ -159,5 +219,12 @@ const styles = StyleSheet.create({
 		paddingVertical: 10,
 		paddingHorizontal: 12,
 		marginTop: 15,
+	},
+	uploading: {
+		margin: -10,
+		backgroundColor: 'rgba(0,0,0,0.7)',
+		elevation: 50,
+		zIndex: 50,
+		flex: 1,
 	},
 });

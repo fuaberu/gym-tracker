@@ -14,6 +14,9 @@ import { useNavigation } from '@react-navigation/native';
 import DivisionLine from '../components/small components/DivisionLine';
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/slices/userSlice';
+import MeasureInput from '../components/small components/MeasureInput';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import ActionBtn from '../components/small components/ActionBtn';
 
 type LoginSceenProp = StackNavigationProp<RootStackParamList, 'SignUp'>;
 
@@ -23,6 +26,8 @@ const RegisterScreen = () => {
 	const [emailValid, setEmailValid] = useState(false);
 	const [password, setPassword] = useState('');
 	const [passwordValid, setPasswordValid] = useState(false);
+	const [weight, setWeight] = useState(0);
+	const [height, setHeight] = useState(0);
 
 	const navigation = useNavigation<LoginSceenProp>();
 	const dispatch = useDispatch();
@@ -60,6 +65,7 @@ const RegisterScreen = () => {
 						icon={<AntDesign name="user" size={24} color={colorStyles.gradient2} />}
 						setState={setName}
 						state={name}
+						placeholder="My name"
 					/>
 					<Input
 						label="Email"
@@ -67,15 +73,44 @@ const RegisterScreen = () => {
 						setState={setEmail}
 						validation={{ type: 'email', setValidation: setEmailValid }}
 						state={email}
+						placeholder="myemail@mail.com"
 					/>
+					<View style={{ flexDirection: 'row' }}>
+						<MeasureInput
+							label="Weight"
+							placeholder={60}
+							icon={
+								<MaterialCommunityIcons
+									name="scale-bathroom"
+									size={24}
+									color={colorStyles.gradient2}
+								/>
+							}
+							state={weight}
+							setState={setWeight}
+							option={'kg'}
+						/>
+						<MeasureInput
+							label="Height"
+							placeholder={170}
+							icon={
+								<MaterialCommunityIcons
+									name="human-male-height-variant"
+									size={24}
+									color={colorStyles.gradient2}
+								/>
+							}
+							state={height}
+							setState={setHeight}
+							option={'cm'}
+						/>
+					</View>
 					<InputPassword
 						setState={setPassword}
 						setValidation={setPasswordValid}
 						state={password}
 					/>
-					<LinearButton onPress={() => onSignUpPress()}>
-						<Text>Sign Up</Text>
-					</LinearButton>
+					<ActionBtn text="Sign Up" onPress={onSignUpPress} />
 				</View>
 			</KeyboardAwareScrollView>
 		</View>

@@ -16,33 +16,26 @@ export type UserState = {
 	data: UserData;
 };
 
+const initialState: UserState = {
+	loggedIn: false,
+	data: null,
+};
 // const initialState: UserState = {
-// 	loggedIn: false,
+// 	loggedIn: true,
 // 	data: {
-// 		userId: '',
-// 		fullname: '',
-// 		email: '',
-// 		createdAt: '',
+// 		createdAt: 1640631703063,
+// 		email: 'test@gmail.com',
+// 		fullname: 'test',
+// 		height: 193,
+// 		weight: 90,
+// 		options: {
+// 			length: 'cm',
+// 			weight: 'kg',
+// 		},
 // 		profilePic: null,
-// 		options: { weight: 'kg', length: 'cm' },
+// 		userId: 'iOo6FWoeHggT2d9mSiM2BVT3YYt1',
 // 	},
 // };
-const initialState: UserState = {
-	loggedIn: true,
-	data: {
-		createdAt: 1640631703063,
-		email: 'test@gmail.com',
-		fullname: 'test',
-		height: 193,
-		weight: 90,
-		options: {
-			length: 'cm',
-			weight: 'kg',
-		},
-		profilePic: null,
-		userId: 'iOo6FWoeHggT2d9mSiM2BVT3YYt1',
-	},
-};
 
 export const userSlice = createSlice({
 	name: 'user',

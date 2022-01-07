@@ -20,6 +20,7 @@ import {
 	clearExercises,
 	deleteExercise,
 	deleteLine,
+	updateDate,
 	updateExercise,
 	updateName,
 } from '../redux/slices/exercisesSlice';
@@ -36,9 +37,10 @@ const AddWorkout = () => {
 	const exercises = useSelector((state: RootState) => state.exercises);
 
 	const navigation = useNavigation<addWorkoutScreenProp>();
+
 	const dispatch = useDispatch();
 
-	const onChange = (event: any, selectedDate: Date) => {
+	const onDateChange = (event: any, selectedDate: Date) => {
 		const currentDate = selectedDate || date;
 		setShowDate(Platform.OS === 'ios');
 		setDate(currentDate);
@@ -51,11 +53,16 @@ const AddWorkout = () => {
 	const openNewModal = () => {
 		if (!data) return;
 		console.log('open modal');
-		navigation.navigate('NewExerciseModal', { userId: data.userId });
+		navigation.navigate('NewExerciseModal', {
+			userId: data.userId,
+			date: date.getTime(),
+		});
 	};
 
 	const pressSave = async () => {
 		if (!data) return;
+		//set the selected date to all exercises
+		dispatch(updateDate({ date: date.getTime() }));
 		const workoutUpload = {
 			exercises,
 			createdAt: date.getTime(),
@@ -113,7 +120,9 @@ const AddWorkout = () => {
 							value={date}
 							is24Hour={true}
 							display="default"
-							onChange={(event: any, selectedDate: any) => onChange(event, selectedDate)}
+							onChange={(event: any, selectedDate: any) =>
+								onDateChange(event, selectedDate)
+							}
 						/>
 					)}
 

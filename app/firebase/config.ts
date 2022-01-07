@@ -9,7 +9,6 @@ import {
 	where,
 	getDocs,
 	orderBy,
-	addDoc,
 	writeBatch,
 	startAt,
 	endAt,
@@ -21,9 +20,14 @@ import {
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
 	signOut,
-	onAuthStateChanged,
-	browserLocalPersistence,
 } from 'firebase/auth';
+import {
+	getDownloadURL,
+	getStorage,
+	ref,
+	uploadBytes,
+	uploadString,
+} from 'firebase/storage';
 import { Exercise } from '../components/ExerciseTable';
 
 const firebaseConfig = {
@@ -42,7 +46,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore();
 //initialize auth
 const auth = getAuth();
-// auth.setPersistence(browserLocalPersistence);
+//initialize storage
+const storage = getStorage(app);
 
 // ----------- AUTH ----------- //
 
@@ -78,7 +83,6 @@ export const loginUser = async (email: string, password: string) => {
 		const docSnap = await getDoc(docRef);
 
 		if (docSnap.exists()) {
-			console.log(docSnap.data(), 'login');
 			return docSnap.data();
 		} else {
 			// doc.data() will be undefined in this case
@@ -109,6 +113,18 @@ export const updateUser = async (uid: string, updateInfo: any) => {
 		return 'Error to update, please try again later';
 	}
 };
+
+export const uplpoadUserPic = async (filename: string, blob: Blob) => {
+	try {
+		const profileRef = ref(storage, `profilePictures/${filename}`);
+		const response = await uploadBytes(profileRef, blob);
+		const downloadUrl = getDownloadURL(response.ref);
+		return downloadUrl;
+	} catch (error) {
+		console.log(error);
+	}
+};
+
 export const deleteUser = async (uid: string) => {
 	try {
 		const userRef = doc(db, 'users', uid);
@@ -128,7 +144,6 @@ export const userLogged = async () => {
 			const docSnap = await getDoc(docRef);
 
 			if (docSnap.exists()) {
-				console.log('Document data:', docSnap.data());
 				return docSnap.data();
 			} else {
 				// doc.data() will be undefined in this case
@@ -173,6 +188,7 @@ export const saveWorkout = async (
 			workoutId: workoutRef.id,
 		};
 		batch.set(workoutRef, workoutObj);
+		//commit changes
 		await batch.commit();
 		return 'Data stored succesfully';
 	} catch (error) {
@@ -183,9 +199,21 @@ export const saveWorkout = async (
 
 export const updateDbWorkouts = async (workout: Workout) => {
 	try {
+		const batch = writeBatch(db);
+		//update the exercises
+		workout.exercises.forEach((e) => {
+			const exerciseRef = doc(db, 'exercises', e.exerciseId);
+
+			batch.set(workoutRef, e);
+		});
+
+		//update the workout
 		const workoutRef = doc(db, 'workouts', workout.workoutId);
 
-		await updateDoc(workoutRef, workout);
+		batch.set(workoutRef, workout);
+
+		//commit changes
+		await batch.commit();
 		return 'Workout updated successfully';
 	} catch (error) {
 		console.log(error);
