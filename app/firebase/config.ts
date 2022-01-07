@@ -99,6 +99,26 @@ export const signOutUser = async () => {
 	}
 };
 
+export const updateUser = async (uid: string, updateInfo: any) => {
+	try {
+		const userRef = doc(db, 'users', uid);
+		await updateDoc(userRef, updateInfo);
+		return 'Updated';
+	} catch (error) {
+		console.log(error);
+		return 'Error to update, please try again later';
+	}
+};
+export const deleteUser = async (uid: string) => {
+	try {
+		const userRef = doc(db, 'users', uid);
+		return 'deleted';
+	} catch (error) {
+		console.log(error);
+		return 'Error to delete account, please try again later';
+	}
+};
+
 export const userLogged = async () => {
 	const user = auth.currentUser;
 	try {
@@ -227,12 +247,40 @@ export const getSuggestions = async (userId: string, exerciseName: string) => {
 				name: doc.data().name,
 				createdAt: doc.data().createdAt,
 				sets: doc.data().sets,
+				exerciseId: doc.data().exerciseId,
 			};
 			if (suggestions.some((el) => el.name === doc.data().name)) return;
 
 			suggestions.push(docData);
 		});
 		return suggestions;
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+export const getExercise = async (userId: string, exerciseName: string) => {
+	//get all exercises from the userId with the same name
+	try {
+		const q = query(
+			collection(db, 'exercises'),
+			where('userId', '==', userId),
+			where('name', '==', exerciseName),
+			orderBy('createdAt')
+		);
+		const exercises: Exercise[] = [];
+
+		const querySnapshot = await getDocs(q);
+		querySnapshot.forEach((doc) => {
+			exercises.push({
+				name: doc.data().name,
+				userId: doc.data().userId,
+				createdAt: doc.data().createdAt,
+				sets: doc.data().sets,
+				exerciseId: doc.data().exerciseId,
+			});
+		});
+		return exercises;
 	} catch (error) {
 		console.log(error);
 	}

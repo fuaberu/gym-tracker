@@ -10,17 +10,11 @@ import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MeasureInput from '../components/small components/MeasureInput';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import LinearButton from '../components/small components/LinearButton';
 import { LinearGradient } from 'expo-linear-gradient';
+import { updateUser } from '../firebase/config';
 
 const ProfileScreen = () => {
 	const { data } = useSelector((state: RootState) => state.user);
-	const [unitOptions, setUnitOptions] = useState();
-	const [fullname, setFullname] = useState('');
-	const [email, setEmail] = useState('');
-	const [weight, setWeight] = useState(0);
-	const [height, setHeight] = useState(0);
-
 	if (!data)
 		return (
 			<ActivityIndicator
@@ -29,8 +23,15 @@ const ProfileScreen = () => {
 				style={globalStyles.absoluteCenter}
 			/>
 		);
+	const [fullname, setFullname] = useState(data.fullname);
+	const [email, setEmail] = useState(data.email);
+	const [weight, setWeight] = useState(data.weight);
+	const [height, setHeight] = useState(data.height);
 
-	const updateData = () => {};
+	const updateData = async () => {
+		const newUser = await updateUser(data.userId, { fullname, email, weight, height });
+		console.log(newUser);
+	};
 	const deleteAccount = () => {};
 	return (
 		<View style={{ padding: 10 }}>
