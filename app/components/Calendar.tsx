@@ -44,21 +44,32 @@ const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 		}
 	}
 
+	const amountOfDivs = maxDays < 31 ? 35 : firstDay < 6 ? 35 : 42;
+	//if
+
 	let dayCount = 1;
-	for (let i = 0; i < 35; i++) {
-		let match = workouts?.find(
-			//check if there is a workout that day
-			(e) =>
-				new Date(e.createdAt).getDate() === dayCount &&
-				new Date(e.createdAt).getMonth() === month &&
-				new Date(e.createdAt).getFullYear() === year
-		);
-		if (match) {
-			daysMatrix.push({ id: i, day: dayCount, workoutId: match.workoutId, month, year });
-			dayCount++;
-		} else if (firstDay <= i && dayCount <= maxDays) {
-			daysMatrix.push({ id: i, day: dayCount, month, year });
-			dayCount++;
+	for (let i = 0; i < amountOfDivs; i++) {
+		if (firstDay <= i && dayCount <= maxDays) {
+			let match = workouts?.find(
+				//check if there is a workout that day
+				(e) =>
+					new Date(e.createdAt).getDate() === dayCount &&
+					new Date(e.createdAt).getMonth() === month &&
+					new Date(e.createdAt).getFullYear() === year
+			);
+			if (match) {
+				daysMatrix.push({
+					id: i,
+					day: dayCount,
+					workoutId: match.workoutId,
+					month,
+					year,
+				});
+				dayCount++;
+			} else {
+				daysMatrix.push({ id: i, day: dayCount, month, year });
+				dayCount++;
+			}
 		} else {
 			daysMatrix.push({ id: i, day: 0 });
 		}
