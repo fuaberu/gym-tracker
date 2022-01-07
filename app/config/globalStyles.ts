@@ -3,6 +3,7 @@ import colorStyles from './colors';
 export default {
 	componentElevated: {
 		backgroundColor: colorStyles.componentBackgroundSecondary,
+		marginVertical: 10,
 		shadowColor: colorStyles.black,
 		shadowOffset: {
 			width: 0,
@@ -12,7 +13,7 @@ export default {
 		shadowRadius: 5.46,
 
 		elevation: 9,
-		borderRadius: 5,
+		borderRadius: 10,
 		padding: 10,
 	},
 	textPrimary: { color: colorStyles.textPrymary, fontSize: 16 },

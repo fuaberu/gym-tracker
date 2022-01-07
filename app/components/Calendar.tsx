@@ -12,6 +12,7 @@ import { RootStackParamList } from '../../Navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { getUserWorkouts, Workout } from '../firebase/config';
 import { setReduxWorkouts } from '../redux/slices/workoutsSlice';
+import globalStyles from '../config/globalStyles';
 
 type wellcomeScreenProp = StackNavigationProp<RootStackParamList, 'Wellcome'>;
 
@@ -105,7 +106,7 @@ const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 	};
 
 	return (
-		<View style={styles.container}>
+		<View style={globalStyles.componentElevated}>
 			<View style={styles.headerContainer}>
 				<TouchableOpacity onPress={() => changeMonth(-1)}>
 					<AntDesign name="arrowleft" size={24} color={colorStyles.gradient2} />
@@ -129,6 +130,7 @@ const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 					columnWrapperStyle={{ justifyContent: 'space-between' }}
 					data={daysMatrix}
 					numColumns={7}
+					scrollEnabled={false}
 					renderItem={({ item }) => (
 						<View style={styles.dayItem}>
 							{item.workoutId ? (
@@ -168,17 +170,17 @@ const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 export default Calendar;
 
 const styles = StyleSheet.create({
-	container: { backgroundColor: colorStyles.componentBackground },
 	headerContainer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		padding: 10,
+		paddingBottom: 10,
 	},
 	text: { color: colorStyles.textPrymary },
 	weekDaysContainer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		backgroundColor: colorStyles.componentBackgroundSecondary,
+		backgroundColor: colorStyles.componentBackground,
+		marginHorizontal: -10,
 		padding: 10,
 	},
 	daysContainer: { padding: 10 },
