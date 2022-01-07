@@ -22,9 +22,10 @@ interface Set {
 }
 
 export interface Exercise {
+	exerciseId: string;
 	userId: string;
 	name: string;
-	createdAt: string;
+	createdAt: number;
 	sets: Set[];
 }
 

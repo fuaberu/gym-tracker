@@ -10,7 +10,7 @@ import { RootState } from '../redux/store';
 import colorStyles from '../config/colors';
 import globalStyles from '../config/globalStyles';
 import LinearButton from '../components/small components/LinearButton';
-import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import WorkoutSowcase from '../components/WorkoutSowcase';
 import Stats from '../components/Stats';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';

@@ -35,7 +35,6 @@ const MeasureInput = ({
 		switch (optionPressed) {
 			case 'kg':
 				optionToShow !== 'kg' && setDataShown(dataShown * 2.205);
-				console.log(state, dataShown);
 				break;
 			case 'lb':
 				optionToShow !== 'lb' && setDataShown(dataShown / 2.205);
@@ -49,7 +48,6 @@ const MeasureInput = ({
 		}
 		setOptionsToShow(optionPressed);
 		setOptionsOpen(false);
-		// console.log(placeholder);
 	};
 
 	const setNumber = (text: string) => {
@@ -76,7 +74,6 @@ const MeasureInput = ({
 					break;
 			}
 		}
-		console.log(placeholder, dataShown);
 	};
 	return (
 		<View style={{ flex: 1, zIndex: 1 }}>

@@ -13,7 +13,7 @@ export const workoutsSlice = createSlice({
 		setReduxWorkouts: (state, { payload }) => {
 			return payload;
 		},
-		clearWorkouts: (state) => {
+		clearWorkouts: () => {
 			return [];
 		},
 		deleteWorkoutExercise: (state, { payload }) => {
