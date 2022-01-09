@@ -120,7 +120,13 @@ const ExerciseTable = ({
 											lineIndex + 1
 										}`}</Text>
 									</View>
-									<View style={{ flex: 3 }}>
+									<View
+										style={{
+											flex: 3,
+											flexDirection: 'row',
+											justifyContent: 'center',
+										}}
+									>
 										<NumericInput
 											tableIndex={tableIndex}
 											value={value.reps}
@@ -128,8 +134,27 @@ const ExerciseTable = ({
 											lineIndex={lineIndex}
 											column={'reps'}
 										/>
+										{value.reps > 0 && (
+											<Text
+												style={[
+													{
+														textAlignVertical: 'center',
+													},
+													globalStyles.textSecondary,
+												]}
+											>
+												{' '}
+												reps
+											</Text>
+										)}
 									</View>
-									<View style={{ flex: 3 }}>
+									<View
+										style={{
+											flex: 3,
+											flexDirection: 'row',
+											justifyContent: 'center',
+										}}
+									>
 										<NumericInput
 											tableIndex={tableIndex}
 											onChange={onChange}
@@ -137,6 +162,19 @@ const ExerciseTable = ({
 											lineIndex={lineIndex}
 											column={'weight'}
 										/>
+										{value.weight > 0 && (
+											<Text
+												style={[
+													{
+														textAlignVertical: 'center',
+													},
+													globalStyles.textSecondary,
+												]}
+											>
+												{' '}
+												{data?.options.weight}
+											</Text>
+										)}
 									</View>
 								</View>
 							</Swipeable>
@@ -144,10 +182,7 @@ const ExerciseTable = ({
 					})}
 				</View>
 				<View style={styles.addLineContainer}>
-					<TouchableOpacity
-						style={styles.addLine}
-						onPress={() => addExerciseLine(tableIndex)}
-					>
+					<TouchableOpacity onPress={() => addExerciseLine(tableIndex)}>
 						<AntDesign name="pluscircle" size={34} color={colorStyles.gradient1} />
 					</TouchableOpacity>
 				</View>
@@ -169,7 +204,8 @@ const styles = StyleSheet.create({
 		width: 50,
 	},
 	container: {
-		padding: 8,
+		paddingHorizontal: 8,
+		paddingVertical: 15,
 		marginBottom: 25,
 		borderRadius: 10,
 	},
@@ -202,12 +238,9 @@ const styles = StyleSheet.create({
 	headline: { textAlign: 'center' },
 	addLineContainer: {
 		position: 'absolute',
-		left: 0,
-		right: 0,
-		bottom: -17,
-		justifyContent: 'center',
+		alignSelf: 'center',
+		bottom: -18,
 	},
-	addLine: { alignItems: 'center' },
 	lineText: {
 		color: colorStyles.textPrymary,
 		textAlign: 'center',

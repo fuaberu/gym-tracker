@@ -25,6 +25,8 @@ import {
 	updateName,
 } from '../redux/slices/exercisesSlice';
 import { addWorkout } from '../redux/slices/workoutsSlice';
+import globalStyles from '../config/globalStyles';
+import ActionBtn from '../components/small components/ActionBtn';
 
 type addWorkoutScreenProp = StackNavigationProp<RootStackParamList, 'AddWorkout'>;
 
@@ -107,12 +109,13 @@ const AddWorkout = () => {
 		column: string,
 		tableIndex: number
 	) => {
+		if (isNaN(Number(text))) return;
 		dispatch(updateExercise({ tableIndex, lineIndex, column, text }));
 	};
 
 	return (
-		<KeyboardAwareScrollView style={{ flex: 1, padding: 10 }}>
-			<View style={styles.container}>
+		<View style={styles.container}>
+			<KeyboardAwareScrollView contentContainerStyle={{ paddingBottom: 15 }}>
 				<View>
 					{showDate && (
 						<DateTimePicker
@@ -126,14 +129,14 @@ const AddWorkout = () => {
 						/>
 					)}
 
-					<Text style={styles.text}>Workout name</Text>
+					<Text style={globalStyles.textSecondary}>Workout name</Text>
 
 					<TextInput
-						style={[styles.text, styles.input]}
+						style={[globalStyles.textPrimary, styles.input]}
 						value={workoutName}
 						onChangeText={(text) => setWorkoutName(text)}
 					/>
-					<Text style={styles.text}>When did you workout?</Text>
+					<Text style={globalStyles.textSecondary}>When did you workout?</Text>
 					<TouchableOpacity
 						onPress={showDatepicker}
 						style={[styles.dateButton, styles.input]}
@@ -141,9 +144,20 @@ const AddWorkout = () => {
 						<View style={styles.iconContainer}>
 							<AntDesign name="calendar" size={24} color={colorStyles.gradient2} />
 						</View>
-						<Text style={styles.text}>{moment(date).format('MM/DD/YYYY')}</Text>
+						<Text style={globalStyles.textPrimary}>
+							{moment(date).format('MM/DD/YYYY')}
+						</Text>
 					</TouchableOpacity>
-					<Text style={styles.text}>Add exercises to your workout</Text>
+					{exercises.length > 0 && (
+						<Text
+							style={[
+								globalStyles.textTitleSecondary,
+								{ textAlign: 'center', marginTop: 15 },
+							]}
+						>
+							Workout Exercises
+						</Text>
+					)}
 
 					{/* map exercises tables */}
 					{exercises.map((value, index) => {
@@ -169,7 +183,7 @@ const AddWorkout = () => {
 							style={{ borderRadius: 1000 }}
 						>
 							<View style={styles.addBtn}>
-								<Text style={[styles.text, { textAlign: 'center' }]}>
+								<Text style={[globalStyles.textTitleSecondary, { textAlign: 'center' }]}>
 									Add New Exercise
 								</Text>
 								<View style={styles.plusIcon}>
@@ -179,19 +193,16 @@ const AddWorkout = () => {
 						</LinearGradient>
 					</TouchableOpacity>
 				</View>
-
-				<LinearButton style={styles.saveBtn} onPress={pressSave}>
-					<Text style={styles.saveBtn}>Save</Text>
-				</LinearButton>
-			</View>
-		</KeyboardAwareScrollView>
+			</KeyboardAwareScrollView>
+			<ActionBtn style={{ marginTop: 0 }} text="Save" onPress={pressSave} />
+		</View>
 	);
 };
 
 export default AddWorkout;
 
 const styles = StyleSheet.create({
-	container: { flex: 1, justifyContent: 'space-between', marginBottom: 25 },
+	container: { flex: 1, justifyContent: 'space-between', marginBottom: 15, padding: 10 },
 	input: {
 		height: 48,
 		borderRadius: 5,

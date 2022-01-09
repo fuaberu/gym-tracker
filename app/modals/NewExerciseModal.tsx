@@ -14,6 +14,7 @@ import { Exercise } from '../components/ExerciseTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { addNewExercise } from '../redux/slices/exercisesSlice';
+import ActionBtn from '../components/small components/ActionBtn';
 
 type NewExerciseModalScreenProp = StackNavigationProp<
 	RootStackParamList,
@@ -73,33 +74,31 @@ const NewExerciseModal = () => {
 	};
 
 	return (
-		<View style={{ flex: 1 }}>
-			<View>
-				<Text>Add a new Exercise</Text>
-				<DivisionLine />
+		<View style={{ flex: 1, paddingVertical: 30, paddingHorizontal: 10 }}>
+			<View style={{ zIndex: 5, elevation: 5, flex: 1 }}>
 				<Input
 					icon={<AntDesign name="search1" size={24} color={colorStyles.gradient2} />}
 					setState={onNameChange}
 					state={exerciseName}
-					label="Exercise Name"
+					label="New Exercise Name"
 				/>
-				<View style={styles.suggestionsContainer}>
-					{suggestions.map((suggestion, index) => {
-						return (
-							<TouchableOpacity
-								style={styles.suggestion}
-								onPress={() => suggestionPress(suggestion)}
-								key={index}
-							>
-								<Text style={styles.text}>{suggestion.name}</Text>
-							</TouchableOpacity>
-						);
-					})}
-				</View>
+				{suggestions.length > 0 && (
+					<View style={styles.suggestionsContainer}>
+						{suggestions.map((suggestion, index) => {
+							return (
+								<TouchableOpacity
+									style={styles.suggestion}
+									onPress={() => suggestionPress(suggestion)}
+									key={index}
+								>
+									<Text style={styles.text}>{suggestion.name}</Text>
+								</TouchableOpacity>
+							);
+						})}
+					</View>
+				)}
 			</View>
-			<LinearButton onPress={() => pressCreate()}>
-				<Text>Create</Text>
-			</LinearButton>
+			<ActionBtn text="Create Exercise" onPress={pressCreate} />
 		</View>
 	);
 };
@@ -110,11 +109,13 @@ const styles = StyleSheet.create({
 	text: { color: colorStyles.textPrymary },
 	suggestionsContainer: {
 		position: 'absolute',
-		top: 110,
+		top: 90,
 		left: 20,
 		right: 20,
 		elevation: 1,
 		backgroundColor: colorStyles.componentBackground,
+		paddingTop: 5,
+		paddingHorizontal: 2,
 	},
 	suggestion: {
 		backgroundColor: colorStyles.componentBackgroundSecondary,

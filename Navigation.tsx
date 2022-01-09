@@ -122,6 +122,7 @@ export default function Navigation() {
 							options={{
 								headerStyle: styles.headerStyle,
 								headerTintColor: colorStyles.textPrymary,
+								title: 'Add Workout',
 								headerTitleStyle: {
 									fontWeight: 'bold',
 								},

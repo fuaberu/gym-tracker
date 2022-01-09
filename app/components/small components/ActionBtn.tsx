@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, ViewStyle } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import colorStyles from '../../config/colors';
 import globalStyles from '../../config/globalStyles';
@@ -9,16 +9,18 @@ const ActionBtn = ({
 	text,
 	child,
 	onPress,
+	style,
 }: {
 	text?: string;
 	child?: Component;
 	onPress: () => void;
+	style?: ViewStyle;
 }) => {
 	return (
 		<TouchableOpacity onPress={() => onPress()}>
 			<LinearGradient
 				colors={[colorStyles.gradient1, colorStyles.gradient2]}
-				style={styles.buttonContainer}
+				style={[styles.buttonContainer, style]}
 			>
 				{text && (
 					<Text

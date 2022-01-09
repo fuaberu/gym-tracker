@@ -28,7 +28,11 @@ const NumericInput = ({ value, lineIndex, column, onChange, tableIndex }: Props)
 			onChangeText={(text) => onChange(text, lineIndex, column, tableIndex)}
 			onBlur={onBlur}
 			onFocus={onFocus}
-			style={{ color: color, width: 50 }}
+			style={{
+				color: color,
+				width: 50,
+				textAlign: 'right',
+			}}
 		/>
 	);
 };
