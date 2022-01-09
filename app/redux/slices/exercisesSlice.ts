@@ -11,9 +11,9 @@ export const exercisesSlice = createSlice({
 			state.push(payload);
 		},
 		updateExercise: (state, { payload }) => {
-			if (isNaN(payload.text)) return;
-
-			state[payload.tableIndex].sets[payload.lineIndex][payload.column] = payload.text;
+			state[payload.tableIndex].sets[payload.lineIndex][payload.column] = Number(
+				payload.text
+			);
 		},
 		updateName: (state, { payload }) => {
 			state[payload.tableIndex].name = payload.text;
