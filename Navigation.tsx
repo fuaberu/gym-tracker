@@ -1,13 +1,13 @@
 import 'react-native-gesture-handler';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import LoginScreen from './app/screens/LoginScreen';
 import RegisterScreen from './app/screens/RegisterScreen';
 import WellcomeScreen from './app/screens/WellcomeScreen';
 import { useEffect, useState } from 'react';
-import { getUserWorkouts, userLogged } from './app/firebase/config';
+import { auth, getUser, getUserWorkouts } from './app/firebase/config';
 import { setUserData } from './app/redux/slices/userSlice';
 import AddWorkout from './app/screens/AddWorkout';
 import NewExerciseModal from './app/modals/NewExerciseModal';
@@ -16,13 +16,10 @@ import { RootState } from './app/redux/store';
 import WorkoutDetailsModal from './app/modals/WorkoutDetailsModal';
 import colorStyles from './app/config/colors';
 import globalStyles from './app/config/globalStyles';
-
-//ignore timer warnings
-import { LogBox } from 'react-native';
 import { setReduxWorkouts } from './app/redux/slices/workoutsSlice';
 import ProfileScreen from './app/screens/ProfileScreen';
 import SettingsModal from './app/modals/SettingsModal';
-LogBox.ignoreLogs(['Setting a timer']);
+import { onAuthStateChanged } from 'firebase/auth';
 
 export type RootStackParamList = {
 	Profile: undefined;
@@ -53,30 +50,39 @@ export default function Navigation() {
 		dispatch(setReduxWorkouts(workoutsData));
 	};
 
-	const getUser = async () => {
-		const loggedUser = await userLogged();
-		if (loggedUser) {
-			await getWorkouts(loggedUser.userId);
-			dispatch(setUserData(loggedUser));
-		}
-		setAppLoading(false);
+	const initialUser = () => {
+		onAuthStateChanged(auth, async (user) => {
+			if (user) {
+				const userData = await getUser(user.uid);
+
+				//set user workouts
+				await getWorkouts(user.uid);
+
+				//dispach user data to redux
+				dispatch(setUserData(userData));
+
+				//then inicialize the app
+				setAppLoading(false);
+			} else {
+				//inicialize the app
+				setAppLoading(false);
+			}
+		});
 	};
 
 	useEffect(() => {
-		getUser();
+		initialUser();
 	}, []);
-
-	useEffect(() => {
-		setAppLoading(false);
-	}, [user]);
 
 	if (appLoading)
 		return (
-			<ActivityIndicator
-				size={50}
-				color={colorStyles.gradient2}
-				style={globalStyles.absoluteCenter}
-			/>
+			<View style={{ flex: 1, backgroundColor: colorStyles.background }}>
+				<ActivityIndicator
+					size={50}
+					color={colorStyles.gradient2}
+					style={globalStyles.absoluteCenter}
+				/>
+			</View>
 		);
 
 	const MyTheme = {

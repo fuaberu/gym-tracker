@@ -20,6 +20,7 @@ import {
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
 	signOut,
+	onAuthStateChanged,
 } from 'firebase/auth';
 import {
 	getDownloadURL,
@@ -29,6 +30,7 @@ import {
 	uploadString,
 } from 'firebase/storage';
 import { Exercise } from '../components/ExerciseTable';
+import { UserData } from '../redux/slices/userSlice';
 
 const firebaseConfig = {
 	apiKey: process.env.REACT_APP_API_KEY,
@@ -43,11 +45,11 @@ const firebaseConfig = {
 //initialize app
 const app = initializeApp(firebaseConfig);
 //initialize db
-const db = getFirestore();
+export const db = getFirestore();
 //initialize auth
-const auth = getAuth();
+export const auth = getAuth();
 //initialize storage
-const storage = getStorage(app);
+export const storage = getStorage(app);
 
 // ----------- AUTH ----------- //
 
@@ -135,21 +137,14 @@ export const deleteUser = async (uid: string) => {
 	}
 };
 
-export const userLogged = async () => {
-	const user = auth.currentUser;
+export const getUser = async (userId: string) => {
 	try {
-		if (user) {
-			//get user data
-			const docRef = doc(db, 'users', user.uid);
-			const docSnap = await getDoc(docRef);
+		//get user data
+		const docRef = doc(db, 'users', userId);
+		const docSnap = await getDoc(docRef);
 
-			if (docSnap.exists()) {
-				return docSnap.data();
-			} else {
-				// doc.data() will be undefined in this case
-				console.log('No such document!');
-				return null;
-			}
+		if (docSnap.exists()) {
+			return docSnap.data();
 		}
 	} catch (error) {
 		console.log(error);
