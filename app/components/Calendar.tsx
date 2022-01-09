@@ -111,7 +111,9 @@ const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 				<TouchableOpacity onPress={() => changeMonth(-1)}>
 					<AntDesign name="arrowleft" size={24} color={colorStyles.gradient2} />
 				</TouchableOpacity>
-				<Text style={styles.text}>{moment(activeDate).format('MMMM YYYY')}</Text>
+				<Text style={globalStyles.textTitleSecondary}>
+					{moment(activeDate).format('MMMM YYYY')}
+				</Text>
 				<TouchableOpacity onPress={() => changeMonth(1)}>
 					<AntDesign name="arrowright" size={24} color={colorStyles.gradient2} />
 				</TouchableOpacity>
@@ -120,19 +122,15 @@ const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 				{weekDays.map((day, index) => {
 					return (
 						<View style={styles.dayItem} key={index}>
-							<Text style={[styles.text]}>{day}</Text>
+							<Text style={globalStyles.textPrimary}>{day}</Text>
 						</View>
 					);
 				})}
 			</View>
 			<View style={styles.daysContainer}>
-				<FlatList
-					columnWrapperStyle={{ justifyContent: 'space-between' }}
-					data={daysMatrix}
-					numColumns={7}
-					scrollEnabled={false}
-					renderItem={({ item }) => (
-						<View style={styles.dayItem}>
+				{daysMatrix.map((item, index) => {
+					return (
+						<View style={styles.dayItem} key={index}>
 							{item.workoutId ? (
 								<LinearButton
 									style={{ width: 35 }}
@@ -160,8 +158,8 @@ const Calendar = ({ workouts }: { workouts: Workout[] }) => {
 								</TouchableOpacity>
 							)}
 						</View>
-					)}
-				/>
+					);
+				})}
 			</View>
 		</View>
 	);
@@ -183,9 +181,9 @@ const styles = StyleSheet.create({
 		marginHorizontal: -10,
 		padding: 10,
 	},
-	daysContainer: { padding: 10 },
+	daysContainer: { paddingTop: 10, flexDirection: 'row', flexWrap: 'wrap' },
 	dayItem: {
-		width: '12%',
+		width: '14.2857%',
 		alignItems: 'center',
 		paddingBottom: 5,
 		paddingTop: 5,
